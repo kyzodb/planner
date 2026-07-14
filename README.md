@@ -9,7 +9,8 @@
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BSL--1.1-2F7E52" alt="License: BSL-1.1"></a>
   <a href="#install"><img src="https://img.shields.io/badge/Claude%20Code-plugin-1E4D33" alt="Claude Code plugin"></a>
-  <a href="#a-grammar-not-a-manual"><img src="https://img.shields.io/badge/tools-33%20typed-1E4D33" alt="33 typed tools"></a>
+  <a href="#a-grammar-not-a-manual"><img src="https://img.shields.io/badge/MCP-33%20typed%20tools-1E4D33" alt="MCP: 33 typed tools"></a>
+  <a href="#install"><img src="https://img.shields.io/badge/python-3.12%2B-2F7E52" alt="Python 3.12+"></a>
   <a href="#the-token-bill-is-the-product"><img src="https://img.shields.io/badge/tokens-watched%20per%20call-2F7E52" alt="Tokens watched per call"></a>
   <a href="#install"><img src="https://img.shields.io/badge/config-zero%20by%20default-1E4D33" alt="Zero config by default"></a>
 </p>
@@ -159,7 +160,7 @@ the thing being killed.
 
 Executing a story is a pipeline of three agents with deliberately unequal powers:
 
-<p align="center"><img src="docs/assets/pipeline.svg" width="860" alt="The execution pipeline: story contract, demolition agent, development-task agent, completion judge. Only the judge holds check_story_task; PASS checks the box, FAIL returns a refusal."></p>
+<p align="center"><img src="docs/assets/story_cycle.svg" width="860" alt="One story, start to Done: start_story gates on git reality, demolition deletes the condemned surface, then one development task at a time runs under a zero-trust monitor and submits evidence to the judge — only the judge's PASS flips a task box, FAIL loops back naming the missing proof, and there is no direct path from developer to checkbox."></p>
 
 - **`kyzo-plan-demolition`** opens every story: it reads the Condemned block and deletes the old
   surface before construction begins — the files, symbols, and escape routes that would otherwise

@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 520" width="860" height="520" font-family="ui-sans-serif, 'IBM Plex Sans', system-ui, sans-serif" role="img" aria-label="One story, start to Done: start_story gates on git reality, demolition deletes the condemned surface, then one development task at a time runs under a zero-trust monitor, submits evidence to the judge, and only the judge's PASS flips a task box on the board; FAIL loops back naming the missing proof, and there is no direct path from the developer to the checkbox.">
+  <defs>
+    <style>
+      .mono { font-family: ui-monospace, 'JetBrains Mono', Menlo, Consolas, monospace; }
+    </style>
+    <marker id="fern" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#3f8a5c"/>
+    </marker>
+    <marker id="fernb" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#6FAE8B"/>
+    </marker>
+    <marker id="clay" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#b0503b"/>
+    </marker>
+  </defs>
+
+  <rect x="2" y="2" width="846" height="516" rx="3" fill="#0c1310" stroke="#263229"/>
+
+  <text x="28" y="40" font-size="18" font-weight="600" fill="#eef3ef">One story, start to Done</text>
+  <text x="28" y="62" font-size="12.5" fill="#7c8f83">Gated entry, demolition first, one watched task at a time, evidence-judged boxes — the whole cycle on the record.</text>
+  <line x1="28" y1="78" x2="832" y2="78" stroke="#263229"/>
+
+  <!-- ── Lane 1: the zero-trust monitor ── -->
+  <text x="28" y="114" font-size="10" letter-spacing="1.2" fill="#55655c">YOU — ZERO TRUST</text>
+  <rect x="164" y="94" width="570" height="32" rx="3" fill="#101813" stroke="#35443b"/>
+  <rect x="164" y="94" width="3" height="32" fill="#2F7E52"/>
+  <text x="449" y="114" text-anchor="middle" class="mono" font-size="11" fill="#8fc4a6">one line per tool call — whip on the FIRST tell</text>
+  <line x1="241" y1="126" x2="241" y2="196" stroke="#6FAE8B" stroke-width="1.2" stroke-dasharray="3 4"/>
+  <line x1="442" y1="126" x2="442" y2="182" stroke="#6FAE8B" stroke-width="1.2" stroke-dasharray="3 4"/>
+
+  <!-- no-direct-path arc: development task ↛ checkbox -->
+  <path d="M 505,214 C 600,140 760,150 755,376" fill="none" stroke="#b0503b" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <line x1="652" y1="158" x2="668" y2="174" stroke="#b0503b" stroke-width="2"/>
+  <line x1="668" y1="158" x2="652" y2="174" stroke="#b0503b" stroke-width="2"/>
+  <text x="660" y="148" text-anchor="middle" font-size="9.5" font-style="italic" fill="#cf7e6b">no direct path to the box</text>
+
+  <!-- ── Lane 2: agents ── -->
+  <text x="28" y="186" font-size="10" letter-spacing="1.2" fill="#55655c">AGENTS</text>
+
+  <!-- start gate -->
+  <rect x="28" y="200" width="104" height="76" rx="3" fill="#101813" stroke="#3a3a2a"/>
+  <rect x="28" y="200" width="3" height="76" fill="#d6ca8a"/>
+  <text x="44" y="224" class="mono" font-size="12" fill="#d6ca8a">start_story</text>
+  <text x="44" y="242" font-size="9" fill="#a9baaf">gated on git reality:</text>
+  <text x="44" y="255" font-size="9" fill="#a9baaf">branch, order, prior</text>
+  <text x="44" y="268" font-size="9" fill="#a9baaf">work present</text>
+  <line x1="132" y1="238" x2="160" y2="238" stroke="#3f8a5c" stroke-width="2" marker-end="url(#fern)"/>
+
+  <!-- demolition -->
+  <rect x="164" y="200" width="154" height="76" rx="3" fill="#12100e" stroke="#5a382e"/>
+  <rect x="164" y="200" width="3" height="76" fill="#b0503b"/>
+  <text x="180" y="224" font-size="12.5" font-weight="600" fill="#cf7e6b">Demolition</text>
+  <text x="180" y="241" font-size="9" fill="#a9baaf">opens every story:</text>
+  <text x="180" y="254" font-size="9" fill="#a9baaf">deletes the condemned</text>
+  <text x="180" y="267" font-size="9" fill="#a9baaf">surface — red tree OK</text>
+  <line x1="318" y1="238" x2="346" y2="238" stroke="#3f8a5c" stroke-width="2" marker-end="url(#fern)"/>
+
+  <!-- task loop container -->
+  <rect x="350" y="188" width="384" height="124" rx="6" fill="none" stroke="#2b3a31" stroke-dasharray="5 4"/>
+  <text x="366" y="205" font-size="9.5" font-style="italic" fill="#7c8f83">once per task, in T# order</text>
+
+  <!-- development task -->
+  <rect x="366" y="214" width="152" height="76" rx="3" fill="#101813" stroke="#35443b"/>
+  <rect x="366" y="214" width="3" height="76" fill="#2F7E52"/>
+  <text x="380" y="236" font-size="12" font-weight="600" fill="#eef3ef">Development task</text>
+  <text x="380" y="252" font-size="9" fill="#a9baaf">one T#, contract pasted</text>
+  <text x="380" y="264" font-size="9" fill="#a9baaf">verbatim; board denied</text>
+  <text x="380" y="277" class="mono" font-size="9" fill="#7c8f83">(disallowedTools)</text>
+  <line x1="518" y1="252" x2="554" y2="252" stroke="#3f8a5c" stroke-width="2" marker-end="url(#fern)"/>
+
+  <!-- judge -->
+  <rect x="558" y="214" width="152" height="76" rx="3" fill="#1E4D33" stroke="#6FAE8B" stroke-width="1.5"/>
+  <text x="572" y="236" font-size="12" font-weight="600" fill="#ffffff">Completion judge</text>
+  <text x="572" y="252" font-size="9" fill="#c6dccd">no code, no courtesy</text>
+  <text x="572" y="264" font-size="9" fill="#c6dccd">review — rules on the</text>
+  <text x="572" y="277" font-size="9" fill="#c6dccd">submitted evidence</text>
+
+  <!-- FAIL loop -->
+  <path d="M 580,290 L 580,302 L 448,302 L 448,294" fill="none" stroke="#b0503b" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#clay)"/>
+  <text x="514" y="311" text-anchor="middle" font-size="9" font-style="italic" fill="#cf7e6b">FAIL — names the missing proof</text>
+
+  <!-- PASS drop to the board -->
+  <line x1="690" y1="290" x2="690" y2="376" stroke="#6FAE8B" stroke-width="2.5" marker-end="url(#fernb)"/>
+  <text x="702" y="338" font-size="10" font-weight="600" fill="#6FAE8B">PASS</text>
+
+  <!-- ── Lane 3: the record ── -->
+  <text x="28" y="368" font-size="10" letter-spacing="1.2" fill="#55655c">THE BOARD &amp; GIT — THE RECORD</text>
+
+  <line x1="80" y1="276" x2="80" y2="380" stroke="#2b3a31" stroke-width="1.2" stroke-dasharray="3 4"/>
+  <rect x="28" y="380" width="140" height="60" rx="3" fill="#0e1511" stroke="#263229"/>
+  <text x="40" y="402" class="mono" font-size="10" fill="#c9d6cc">#212 → In Progress</text>
+  <text x="40" y="418" font-size="9" fill="#7c8f83">on the epic branch,</text>
+  <text x="40" y="430" font-size="9" fill="#7c8f83">focus + assignee set</text>
+
+  <line x1="241" y1="276" x2="241" y2="380" stroke="#2b3a31" stroke-width="1.2" stroke-dasharray="3 4"/>
+  <rect x="180" y="380" width="160" height="60" rx="3" fill="#0e1511" stroke="#263229"/>
+  <text x="192" y="402" class="mono" font-size="10" fill="#c9d6cc">demolition report</text>
+  <text x="192" y="418" font-size="9" fill="#7c8f83">REMOVED · SEVERED ·</text>
+  <text x="192" y="430" font-size="9" fill="#7c8f83">INTENTIONALLY BROKEN</text>
+
+  <rect x="618" y="380" width="144" height="60" rx="3" fill="#101813" stroke="#3f8a5c"/>
+  <rect x="632" y="396" width="14" height="14" rx="2" fill="#2F7E52"/>
+  <path d="M 635,403 L 638,406 L 643,398" fill="none" stroke="#eef3ef" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="654" y="408" class="mono" font-size="11" fill="#c9d6cc">T3 done</text>
+  <text x="632" y="428" font-size="9" fill="#7c8f83">flipped by the judge alone</text>
+
+  <!-- next-task loop back -->
+  <path d="M 618,412 L 400,412 L 400,294" fill="none" stroke="#6FAE8B" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#fernb)"/>
+  <text x="505" y="404" class="mono" font-size="9.5" fill="#8fc4a6">next T#</text>
+
+  <!-- exit: all boxes checked -->
+  <text x="794" y="400" text-anchor="middle" font-size="9" fill="#7c8f83">all boxes ✓</text>
+  <line x1="766" y1="410" x2="826" y2="410" stroke="#3f8a5c" stroke-width="2" marker-end="url(#fern)"/>
+  <text x="832" y="428" text-anchor="end" class="mono" font-size="8.5" fill="#8fc4a6">move_to_done</text>
+
+  <line x1="28" y1="462" x2="832" y2="462" stroke="#1b2620"/>
+  <text x="28" y="482" font-size="10.5" fill="#6d8074">One branch, one story, one watched agent at a time — every box earned, every move on the record.</text>
+  <text x="28" y="500" font-size="10.5" fill="#6d8074">Then move_to_done closes the issue in the same motion, read_next_story hands over the next contract, and finish_epic refuses until the branch is merged.</text>
+</svg>
