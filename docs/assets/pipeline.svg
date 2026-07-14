@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 300" width="860" height="300" font-family="ui-sans-serif, 'IBM Plex Sans', system-ui, sans-serif" role="img" aria-label="The execution pipeline: a story contract feeds the demolition agent, then the development-task agent, which submits evidence to the completion judge — the sole holder of check_story_task. PASS checks the box; FAIL returns a refusal naming the missing evidence. There is no direct path from developer to checkbox.">
+  <defs>
+    <style>
+      .mono { font-family: ui-monospace, 'JetBrains Mono', Menlo, Consolas, monospace; }
+    </style>
+    <marker id="fern" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#3f8a5c"/>
+    </marker>
+    <marker id="fernb" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#6FAE8B"/>
+    </marker>
+    <marker id="clay" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#b0503b"/>
+    </marker>
+  </defs>
+
+  <rect x="2" y="2" width="846" height="296" rx="3" fill="#0c1310" stroke="#263229"/>
+
+  <text x="28" y="38" font-size="18" font-weight="600" fill="#eef3ef">The only path to a checked box</text>
+  <text x="28" y="59" font-size="12.5" fill="#7c8f83">Thinking lives upstream in the contract; execution is downstream — and the executor never grades itself.</text>
+
+  <!-- no-direct-path arc: development task -> checkbox, barred -->
+  <path d="M 440,118 C 500,84 660,84 754,114" fill="none" stroke="#b0503b" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <line x1="596" y1="82" x2="612" y2="100" stroke="#b0503b" stroke-width="2"/>
+  <line x1="612" y1="82" x2="596" y2="100" stroke="#b0503b" stroke-width="2"/>
+  <text x="604" y="76" text-anchor="middle" font-size="10" font-style="italic" fill="#cf7e6b">no direct path — the developer holds no board tools</text>
+
+  <!-- boxes, y 118..182 -->
+  <rect x="28" y="118" width="136" height="64" rx="3" fill="#101813" stroke="#35443b"/>
+  <text x="96" y="141" text-anchor="middle" font-size="12" font-weight="600" fill="#eef3ef">Story contract</text>
+  <text x="96" y="157" text-anchor="middle" font-size="9.5" fill="#7c8f83">condemned · ceiling</text>
+  <text x="96" y="170" text-anchor="middle" font-size="9.5" fill="#7c8f83">T# tasks · named gate</text>
+
+  <line x1="164" y1="150" x2="196" y2="150" stroke="#3f8a5c" stroke-width="2" marker-end="url(#fern)"/>
+
+  <rect x="200" y="118" width="136" height="64" rx="3" fill="#101813" stroke="#35443b"/>
+  <text x="268" y="141" text-anchor="middle" font-size="12" font-weight="600" fill="#eef3ef">Demolition</text>
+  <text x="268" y="157" text-anchor="middle" font-size="9.5" fill="#7c8f83">clears the condemned</text>
+  <text x="268" y="170" text-anchor="middle" font-size="9.5" fill="#7c8f83">surface before building</text>
+
+  <line x1="336" y1="150" x2="368" y2="150" stroke="#3f8a5c" stroke-width="2" marker-end="url(#fern)"/>
+
+  <rect x="372" y="118" width="136" height="64" rx="3" fill="#101813" stroke="#35443b"/>
+  <text x="440" y="141" text-anchor="middle" font-size="12" font-weight="600" fill="#eef3ef">Development task</text>
+  <text x="440" y="157" text-anchor="middle" font-size="9.5" fill="#7c8f83">executes exactly one task</text>
+  <text x="440" y="170" text-anchor="middle" font-size="9.5" fill="#7c8f83">submits evidence, not claims</text>
+
+  <line x1="508" y1="150" x2="540" y2="150" stroke="#3f8a5c" stroke-width="2" marker-end="url(#fern)"/>
+
+  <!-- the judge: solid fern -->
+  <rect x="544" y="118" width="136" height="64" rx="3" fill="#1E4D33" stroke="#6FAE8B" stroke-width="1.5"/>
+  <text x="612" y="141" text-anchor="middle" font-size="12" font-weight="600" fill="#ffffff">Completion judge</text>
+  <text x="612" y="157" text-anchor="middle" font-size="9.5" fill="#c6dccd">sole holder of</text>
+  <text x="612" y="170" text-anchor="middle" font-size="9.5" class="mono" fill="#c6dccd">check_story_task</text>
+
+  <line x1="680" y1="150" x2="712" y2="150" stroke="#6FAE8B" stroke-width="2.5" marker-end="url(#fernb)"/>
+  <text x="696" y="140" text-anchor="middle" font-size="10" font-weight="600" fill="#6FAE8B">PASS</text>
+
+  <!-- the checked box -->
+  <rect x="716" y="126" width="116" height="48" rx="3" fill="#101813" stroke="#3f8a5c"/>
+  <rect x="728" y="142" width="16" height="16" rx="2" fill="#2F7E52"/>
+  <path d="M 731,150 L 735,154 L 741,145" fill="none" stroke="#eef3ef" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="752" y="154" class="mono" font-size="12" fill="#c9d6cc">T3 done</text>
+
+  <!-- FAIL loop back -->
+  <path d="M 612,182 L 612,216 L 440,216 L 440,186" fill="none" stroke="#b0503b" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#clay)"/>
+  <text x="526" y="232" text-anchor="middle" font-size="10" font-style="italic" fill="#cf7e6b">FAIL — a refusal naming the missing evidence</text>
+
+  <line x1="28" y1="254" x2="832" y2="254" stroke="#1b2620"/>
+  <text x="28" y="276" font-size="10.5" fill="#6d8074">Assertions are not evidence, partial completion is not completion — a task box flips on proof, or it does not flip.</text>
+</svg>

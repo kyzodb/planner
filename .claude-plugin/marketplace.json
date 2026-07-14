@@ -1,0 +1,14 @@
+{
+  "name": "kyzo",
+  "description": "Kyzo's Claude Code plugins.",
+  "owner": {
+    "name": "Kyzo"
+  },
+  "plugins": [
+    {
+      "name": "kyzo-planner",
+      "source": "./",
+      "description": "The Kyzo Work board as typed MCP tools with a gated epic/story lifecycle."
+    }
+  ]
+}

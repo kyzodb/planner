@@ -1,0 +1,34 @@
+{
+  "name": "kyzo-planner",
+  "displayName": "Kyzo Planner",
+  "version": "0.1.2",
+  "description": "A GitHub Projects work board as typed MCP tools: pure reads (read_board_status, read_column, ...), gated epic/story lifecycle (start_epic, start_story, finish_epic), free column moves, and authoring verbs \u2014 plus the kyzo-planner-manage-board skill that carries the operating model.",
+  "author": {
+    "name": "Kyzo"
+  },
+  "license": "BUSL-1.1",
+  "keywords": [
+    "board",
+    "kanban",
+    "github-projects",
+    "workflow",
+    "planning"
+  ],
+  "userConfig": {
+    "board_owner": {
+      "type": "string",
+      "title": "Board owner",
+      "description": "Override \u2014 defaults to the checkout's origin owner"
+    },
+    "board_repo": {
+      "type": "string",
+      "title": "Board repo",
+      "description": "Override \u2014 defaults to the checkout's origin repo"
+    },
+    "board_project": {
+      "type": "number",
+      "title": "Project number",
+      "description": "Override \u2014 defaults to the repo's sole open linked GitHub Project"
+    }
+  }
+}

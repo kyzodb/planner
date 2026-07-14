@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 390" width="860" height="390" font-family="ui-sans-serif, 'IBM Plex Sans', system-ui, sans-serif" role="img" aria-label="The name grammar: read_* tools are pure, start_* and finish_* are gated, move_to_* is free, authoring verbs write content, delete_issues is operator-only. 33 tools, four verb shapes.">
+  <defs>
+    <style>
+      .mono { font-family: ui-monospace, 'JetBrains Mono', Menlo, Consolas, monospace; }
+    </style>
+  </defs>
+
+  <rect x="2" y="2" width="846" height="386" rx="3" fill="#0c1310" stroke="#263229"/>
+
+  <text x="28" y="40" font-size="18" font-weight="600" fill="#eef3ef">The name grammar is the law</text>
+  <text x="28" y="62" font-size="12.5" fill="#7c8f83">You don't learn 33 tools; you learn four verb shapes — and the shape is enforced, not conventional.</text>
+  <line x1="28" y1="78" x2="832" y2="78" stroke="#263229"/>
+
+  <!-- band 1: reads -->
+  <rect x="28" y="96" width="804" height="46" rx="3" fill="#101813" stroke="#1f2a23"/>
+  <rect x="28" y="96" width="3" height="46" fill="#3f8a5c"/>
+  <text x="46" y="124" class="mono" font-size="13" fill="#6FAE8B">read_*</text>
+  <text x="250" y="117" font-size="12.5" fill="#a9baaf">Pure, always safe. Orientation costs nothing —</text>
+  <text x="250" y="134" font-size="12.5" fill="#a9baaf"><tspan class="mono" font-size="12">read_board_status</tspan> is the zero-argument way in.</text>
+  <text x="814" y="124" text-anchor="end" font-size="11" fill="#55655c">8 tools</text>
+
+  <!-- band 2: gated -->
+  <rect x="28" y="148" width="804" height="46" rx="3" fill="#101813" stroke="#1f2a23"/>
+  <rect x="28" y="148" width="3" height="46" fill="#d6ca8a"/>
+  <text x="46" y="176" class="mono" font-size="13" fill="#d6ca8a">start_* · finish_*</text>
+  <text x="250" y="169" font-size="12.5" fill="#a9baaf">Gated lifecycle. Every precondition runs first; any failed check</text>
+  <text x="250" y="186" font-size="12.5" fill="#a9baaf">is a typed refusal naming one fact, and nothing has mutated.</text>
+  <text x="814" y="176" text-anchor="end" font-size="11" fill="#55655c">3 tools</text>
+
+  <!-- band 3: moves -->
+  <rect x="28" y="200" width="804" height="46" rx="3" fill="#101813" stroke="#1f2a23"/>
+  <rect x="28" y="200" width="3" height="46" fill="#7fa6bf"/>
+  <text x="46" y="228" class="mono" font-size="13" fill="#7fa6bf">move_to_*</text>
+  <text x="250" y="221" font-size="12.5" fill="#a9baaf">Free moves along the one axis. <tspan class="mono" font-size="12">move_to_done</tspan> closes the issue in</text>
+  <text x="250" y="238" font-size="12.5" fill="#a9baaf">the same motion; <tspan class="mono" font-size="12">move_to_blocked</tspan> demands the blocker by name.</text>
+  <text x="814" y="228" text-anchor="end" font-size="11" fill="#55655c">7 tools</text>
+
+  <!-- band 4: authoring -->
+  <rect x="28" y="252" width="804" height="46" rx="3" fill="#101813" stroke="#1f2a23"/>
+  <rect x="28" y="252" width="3" height="46" fill="#a9baaf"/>
+  <text x="46" y="272" class="mono" font-size="12" fill="#a9baaf">create_* · replace_*</text>
+  <text x="46" y="288" class="mono" font-size="12" fill="#a9baaf">reorder_* · comment_* …</text>
+  <text x="250" y="273" font-size="12.5" fill="#a9baaf">Authoring. Boards, epics, stories, tasks, comments, order —</text>
+  <text x="250" y="290" font-size="12.5" fill="#a9baaf">the content the contracts define, written where everyone reads it.</text>
+  <text x="814" y="280" text-anchor="end" font-size="11" fill="#55655c">14 tools</text>
+
+  <!-- band 5: destructive -->
+  <rect x="28" y="304" width="804" height="46" rx="3" fill="#12100e" stroke="#5a382e"/>
+  <rect x="28" y="304" width="3" height="46" fill="#cf7e6b"/>
+  <text x="46" y="332" class="mono" font-size="13" fill="#cf7e6b">delete_issues</text>
+  <text x="250" y="325" font-size="12.5" fill="#a9baaf">Destructive, operator-ordered only. Every deletion names number AND exact</text>
+  <text x="250" y="342" font-size="12.5" fill="#a9baaf">title; any mismatch refuses the whole batch — the wrong delete is unrepresentable.</text>
+  <text x="814" y="332" text-anchor="end" font-size="11" fill="#55655c">1 tool</text>
+
+  <line x1="28" y1="362" x2="832" y2="362" stroke="#1b2620"/>
+  <text x="28" y="378" font-size="10.5" fill="#6d8074">33 tools, four shapes: what a call may do is visible in its name before it runs.</text>
+</svg>

@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 420" width="860" height="420" role="img" aria-label="Kyzo Planner at a glance: one board one axis, horizons live on epics, a grammar not a manual, gated against git itself, a checked box is earned.">
+  <defs>
+    <style>
+      .sans { font-family: ui-sans-serif, 'IBM Plex Sans', system-ui, sans-serif; }
+      .mono { font-family: ui-monospace, 'JetBrains Mono', Menlo, Consolas, monospace; }
+    </style>
+  </defs>
+
+  <rect x="2" y="2" width="846" height="416" rx="3" fill="#0c1310" stroke="#263229"/>
+  <rect x="2" y="2" width="3" height="416" fill="#2F7E52"/>
+
+  <text x="28" y="42" class="sans" font-size="21" font-weight="600" fill="#eef3ef">At a glance</text>
+  <text x="28" y="64" class="sans" font-size="13" fill="#7c8f83">What the plugin gives you, and why an agent can be trusted with it.</text>
+  <line x1="28" y1="82" x2="832" y2="82" stroke="#263229"/>
+
+  <!-- row 1 -->
+  <text x="28"  y="114" class="sans" font-size="13.5" font-weight="600" fill="#eef3ef">One board, one axis</text>
+  <text x="250" y="112" class="sans" font-size="12.5" fill="#a9baaf">Seven columns — Backlog, Now, In Progress, Blocked, Next, Later, Done — plus order</text>
+  <text x="250" y="130" class="sans" font-size="12.5" fill="#a9baaf">within them. A card's position is the whole state; there is no second ledger to drift.</text>
+  <line x1="28" y1="148" x2="832" y2="148" stroke="#1b2620"/>
+
+  <!-- row 2 -->
+  <text x="28"  y="180" class="sans" font-size="13.5" font-weight="600" fill="#eef3ef">Horizons live on epics</text>
+  <text x="250" y="178" class="sans" font-size="12.5" fill="#a9baaf">A story never stores its own horizon: it derives Now / Next / Later through its parent</text>
+  <text x="250" y="196" class="sans" font-size="12.5" fill="#a9baaf">epic. One fact, one place — moving the epic re-plans every story under it.</text>
+  <line x1="28" y1="214" x2="832" y2="214" stroke="#1b2620"/>
+
+  <!-- row 3 -->
+  <text x="28"  y="246" class="sans" font-size="13.5" font-weight="600" fill="#eef3ef">A grammar, not a manual</text>
+  <text x="250" y="244" class="sans" font-size="12.5" fill="#a9baaf"><tspan class="mono" font-size="12">read_*</tspan> is pure, <tspan class="mono" font-size="12">start_*</tspan>/<tspan class="mono" font-size="12">finish_*</tspan> are gated, <tspan class="mono" font-size="12">move_to_*</tspan> is free, <tspan class="mono" font-size="12">delete_issues</tspan> is</text>
+  <text x="250" y="262" class="sans" font-size="12.5" fill="#a9baaf">operator-only. A tool's name tells you what it may do before you call it.</text>
+  <line x1="28" y1="280" x2="832" y2="280" stroke="#1b2620"/>
+
+  <!-- row 4 -->
+  <text x="28"  y="312" class="sans" font-size="13.5" font-weight="600" fill="#eef3ef">Gated against git itself</text>
+  <text x="250" y="310" class="sans" font-size="12.5" fill="#a9baaf">Lifecycle gates check the tree, the branch, and origin before any mutation. A story</text>
+  <text x="250" y="328" class="sans" font-size="12.5" fill="#a9baaf">marked done with no commits behind it cannot advance — the board cannot outrun the repo.</text>
+  <line x1="28" y1="346" x2="832" y2="346" stroke="#1b2620"/>
+
+  <!-- row 5 -->
+  <text x="28"  y="378" class="sans" font-size="13.5" font-weight="600" fill="#eef3ef">A checked box is earned</text>
+  <text x="250" y="376" class="sans" font-size="12.5" fill="#a9baaf">Only the completion judge holds <tspan class="mono" font-size="12">check_story_task</tspan>: evidence in, PASS or typed refusal</text>
+  <text x="250" y="394" class="sans" font-size="12.5" fill="#a9baaf">out. The agent that wrote the code never grades it.</text>
+</svg>
