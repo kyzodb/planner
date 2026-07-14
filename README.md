@@ -19,8 +19,9 @@ autonomous coding task routinely pushes millions of tokens through the API, most
 the same context re-read on every step. Per-seat bills now run to four figures a month, and
 [token costs are being compared to payroll](https://www.cio.com/article/4189149/ai-coding-token-costs-are-on-track-to-rival-human-payroll.html).
 What runs the meter is rarely the hard thinking. It is waste with a recognizable shape: an agent
-re-deriving what was already decided, reading whole files to feel oriented, wandering off the one
-task it was handed, and grading its own work so the rework surfaces late.
+re-deriving what was already decided, reading whole files to feel oriented, faithfully preserving
+the exact patterns it was sent in to replace, wandering off the one task it was handed, and
+grading its own work so the rework surfaces late.
 
 Kyzo Plan is a control plane built to starve that waste. It keeps the state of work in the one
 place you and your agents read without translation — a GitHub Projects board. Not a mirror of the
@@ -34,14 +35,15 @@ make the cheap path and the correct path the same path:
 
 Input tokens dominate agentic cost because context is re-consumed at every step — so the way to
 cut the bill is not a cheaper model, it is an executor that never acquires what it doesn't need.
-Every mechanism in this plugin answers to that one P&L. Four drains, four mechanisms:
+Every mechanism in this plugin answers to that one P&L. Five drains, five mechanisms:
 
-<p align="center"><img src="docs/assets/economics.svg" width="860" alt="Where agent tokens go: re-derivation starved by the story contract, insurance reads by the stance and live monitor, tool sprawl by scoped surfaces, completion churn by the judge."></p>
+<p align="center"><img src="docs/assets/economics.svg" width="860" alt="Where agent tokens go: re-derivation starved by the story contract, insurance reads by the stance and zero-trust monitor, pattern preservation by demolition running first, tool sprawl by scoped surfaces, completion churn by the judge."></p>
 
 ## Watched at the call, not the retrospective
 
-The development agent's charter instructs its spawner to tail the live tool-call stream — one
-event per call — and judge each read and edit as it lands. Here is a real session: the
+The development agent's charter puts its spawner under zero trust — *this agent will deviate; an
+unwatched deviation is the spawner's fault* — so the spawner tails the live tool-call stream, one
+event per call, and judges each read and edit as it lands. Here is a real session: the
 orchestrator narrating per-call verdicts over a running task agent, catching a self-inflicted
 clobber the moment it happens, auditing the evidence phase in parallel, and spending a handful of
 tokens to do it:
@@ -159,20 +161,25 @@ Executing a story is a pipeline of three agents with deliberately unequal powers
 
 <p align="center"><img src="docs/assets/pipeline.svg" width="860" alt="The execution pipeline: story contract, demolition agent, development-task agent, completion judge. Only the judge holds check_story_task; PASS checks the box, FAIL returns a refusal."></p>
 
-- **`kyzo-plan-demolition`** reads the Condemned block and clears the old surface first —
-  deleting the files, symbols, and escape routes whose survival would let the next agent wrap or
-  route around the design being replaced. It accepts a red tree; a preserved fallback is the
-  failure.
+- **`kyzo-plan-demolition`** opens every story: it reads the Condemned block and deletes the old
+  surface before construction begins — the files, symbols, and escape routes that would otherwise
+  survive wrapped, renamed, or routed around, because the old code is exactly what the next agent
+  would copy. It accepts a red tree; a preserved fallback is the failure.
 - **`kyzo-plan-development-task`** executes exactly one `T#` task. The entire board surface is
   **mechanically denied** to it (`disallowedTools`, not a convention), it does not re-derive, and
   when it believes it is done, all it can do is submit a completion form.
-- **`kyzo-plan-task-completion-judge`** is the sole holder of `check_story_task`. It inspects no
-  code and infers nothing missing: it rules on submitted evidence against the story contract,
+- **`kyzo-plan-task-completion-judge`** is the sole holder of `check_story_task`. It writes no
+  code and performs no courtesy review: it rules on submitted evidence against the story contract,
   actively suspicious, burden of proof on the developer. PASS checks the box; FAIL returns a
   refusal naming the missing evidence.
 
 The separation is the point: the agent that wrote the code cannot grade it, and a checkbox on this
 board is therefore a *fact* — which is exactly what makes the roll-up progress bars worth reading.
+
+And the top of the pipeline is you. Every move is a board event with an author, and every checked
+box carries the evidence that earned it — so you watch the cards move, see who moved them, inspect
+the proof behind any decision, and intervene while a bad behavior is still a tool call, before it
+hardens into a merged pull request or a token bill.
 
 ## Install
 
@@ -207,14 +214,18 @@ manner as everything else here.
 Uninstall with `/plugin uninstall kyzo-plan@kyzo`. Board state lives entirely on GitHub;
 uninstalling leaves nothing behind.
 
-## From the KyzoDB workshop
+## The first tool out of Kyzo
 
 Kyzo Plan is the system [KyzoDB](https://github.com/kyzodb/kyzo) is built with — the screenshots
 above are its live board, and the taste for typed refusals and gated mutations is the same taste
-that put seven numbered laws at the front door of that engine. This plugin does not use or require
-KyzoDB — yet — and needs nothing but `gh` and `uv`. We are sharing it because the work substrate
-turned out to be useful on its own — and if a database whose every answer can be replayed, explained, or
-refused sounds like your kind of thing, you know where the board came from.
+that put seven numbered laws at the front door of that engine. It does not use or require KyzoDB —
+yet — and needs nothing but `gh` and `uv`: we built it because we needed it, we run it every day,
+and it turned out to be worth contributing on its own.
+
+It is also the first of a line. The next tool, **Codegraph**, is being prototyped on KyzoDB now:
+it measures whether each change moves a codebase toward the architecture its team actually
+intends — or away from it. If a database whose every answer can be replayed, explained, or refused
+sounds like your kind of thing, you know where the board came from.
 
 ## License
 
