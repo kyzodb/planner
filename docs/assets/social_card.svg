@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1280 640" width="1280" height="640" role="img" aria-label="Kyzo Plan — a GitHub Projects board your agents can be trusted with">
+  <defs>
+    <style>
+      .sans { font-family: ui-sans-serif, 'IBM Plex Sans', system-ui, sans-serif; }
+      .mono { font-family: ui-monospace, 'JetBrains Mono', Menlo, Consolas, monospace; }
+    </style>
+  </defs>
+
+  <rect width="1280" height="640" fill="#0c1310"/>
+  <rect x="0" y="632" width="1280" height="8" fill="#2F7E52"/>
+
+  <image x="72" y="64" width="72" height="72" href="logo_k.png" xlink:href="logo_k.png"/>
+
+  <text x="164" y="112" class="sans" font-size="44" font-weight="600" fill="#eef3ef">Kyzo Plan</text>
+  <text x="72" y="200" class="sans" font-size="24" fill="#a9baaf">A GitHub Projects board your agents can be trusted with —</text>
+  <text x="72" y="236" class="sans" font-size="24" fill="#a9baaf">and a token meter kept lean by design.</text>
+
+  <rect x="72" y="300" width="240" height="48" rx="3" fill="#101813" stroke="#2F7E52"/>
+  <text x="192" y="330" text-anchor="middle" class="sans" font-size="16" fill="#c9d6cc">35 typed MCP tools</text>
+
+  <rect x="332" y="300" width="240" height="48" rx="3" fill="#101813" stroke="#2F7E52"/>
+  <text x="452" y="330" text-anchor="middle" class="sans" font-size="16" fill="#c9d6cc">gated on git reality</text>
+
+  <rect x="592" y="300" width="240" height="48" rx="3" fill="#101813" stroke="#2F7E52"/>
+  <text x="712" y="330" text-anchor="middle" class="sans" font-size="16" fill="#c9d6cc">judge before the box</text>
+
+  <rect x="852" y="300" width="240" height="48" rx="3" fill="#101813" stroke="#2F7E52"/>
+  <text x="972" y="330" text-anchor="middle" class="sans" font-size="16" fill="#c9d6cc">zero-trust watch</text>
+
+  <text x="72" y="560" class="mono" font-size="18" fill="#6FAE8B">github.com/kyzodb/plan</text>
+  <text x="1208" y="560" text-anchor="end" class="sans" font-size="16" fill="#7c8f83">Claude Code · Cursor</text>
+</svg>
