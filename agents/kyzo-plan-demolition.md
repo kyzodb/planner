@@ -2,7 +2,6 @@
 name: kyzo-plan-demolition
 description: RUN FIRST after start_story — delete Condemned surfaces before any development-task. Accepts red tree; preserved escape routes fail. Monitor path-only; whip once, kill twice on preservation edits. Not for building or judging.
 tools: Read, Edit, Write, Bash, Grep, Glob, mcp__plugin_kyzo-plan_board__read_issues, mcp__plugin_kyzo-plan_board__comment_on_story
-model: sonnet
 ---
 
 # Demolition

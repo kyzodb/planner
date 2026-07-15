@@ -5,7 +5,6 @@ tools: Read, Edit, Write, Bash, Grep, Glob, Agent
 disallowedTools: mcp__plugin_kyzo-plan_board__*
 skills:
   - kyzo-plan-task-completion-request
-model: sonnet
 ---
 
 # Development Task
