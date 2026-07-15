@@ -8,6 +8,7 @@ from pydantic import BaseModel, ConfigDict, Field, RootModel, model_validator
 
 from app.domain.type import (
     Actor,
+    AllowlistPath,
     CeilingChosen,
     CeilingConstraint,
     CeilingMaximum,
@@ -22,6 +23,7 @@ from app.domain.type import (
     IssueLabel,
     IssueNumber,
     LedeLine,
+    SealCommand,
     SoThat,
     SourceEntry,
     StoryContext,
@@ -29,7 +31,7 @@ from app.domain.type import (
     TaskText,
     Want,
 )
-from app.domain.value import Condemned, EngineeringChoice, EvidenceNotNeeded, EvidenceStated, StoryDescription
+from app.domain.value import Allowlist, Condemned, EngineeringChoice, EvidenceNotNeeded, EvidenceStated, StoryDescription
 
 SECTION_ORDER = (
     "Description",
@@ -64,13 +66,23 @@ class Task(BaseModel):
     checked: bool
     text: TaskText
     tid: TaskId | None = None
+    allowlist: Allowlist | None = None
+    seal: SealCommand | None = None
 
     @property
     def markdown(self) -> str:
         box = "x" if self.checked else " "
         if self.tid is not None:
-            return f"- [{box}] {self.tid.rendered} — {self.text.root}"
-        return f"- [{box}] {self.text.root}"
+            head = f"- [{box}] {self.tid.rendered} — {self.text.root}"
+        else:
+            head = f"- [{box}] {self.text.root}"
+        lines = [head]
+        if self.allowlist is not None:
+            paths = ", ".join(f"`{p.root}`" for p in self.allowlist.root)
+            lines.append(f"  - **Allowlist:** {paths}")
+        if self.seal is not None:
+            lines.append(f"  - **Seal:** `{self.seal.root}`")
+        return "\n".join(lines)
 
 
 class TaskIdRefusal(Exception):
@@ -137,7 +149,15 @@ class TaskList(RootModel[tuple[Task, ...]], frozen=True):
         minted: list[Task] = []
         for task in tasks:
             if task.tid is None:
-                minted.append(Task(checked=task.checked, tid=TaskId(nxt), text=task.text))
+                minted.append(
+                    Task(
+                        checked=task.checked,
+                        tid=TaskId(nxt),
+                        text=task.text,
+                        allowlist=task.allowlist,
+                        seal=task.seal,
+                    )
+                )
                 nxt += 1
             else:
                 minted.append(task)
@@ -179,6 +199,21 @@ def _fields(section: str, labels: tuple[str, ...]) -> dict[str, str]:
 
 
 _TASK_ID_RE = re.compile(r"^T(\d+)\s+—\s+(.*)$", re.DOTALL)
+_BACKTICK_RE = re.compile(r"`([^`]+)`")
+
+
+def _parse_allowlist_line(raw: str) -> Allowlist:
+    paths = tuple(AllowlistPath(p) for p in _BACKTICK_RE.findall(raw))
+    if not paths:
+        raise ValueError("Allowlist line needs one or more paths in backticks")
+    return Allowlist(paths)
+
+
+def _parse_seal_line(raw: str) -> SealCommand:
+    hits = _BACKTICK_RE.findall(raw)
+    if len(hits) != 1:
+        raise ValueError("Seal line needs exactly one command in backticks")
+    return SealCommand(hits[0])
 
 
 def _parse_task_line(line: str) -> Task:
@@ -190,12 +225,52 @@ def _parse_task_line(line: str) -> Task:
     return Task(checked=checked, text=TaskText(body))
 
 
+def _is_task_checkbox(line: str) -> bool:
+    return line.startswith("- [ ] ") or line.startswith("- [x] ")
+
+
 def _tasks(section: str) -> tuple[Task, ...]:
-    return tuple(
-        _parse_task_line(line)
-        for line in section.splitlines()
-        if line.startswith("- [ ] ") or line.startswith("- [x] ")
-    )
+    """Checkbox tasks, each optionally followed by indented Allowlist and Seal lines."""
+    lines = section.splitlines()
+    out: list[Task] = []
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        if not _is_task_checkbox(line):
+            i += 1
+            continue
+        task = _parse_task_line(line)
+        allowlist: Allowlist | None = None
+        seal: SealCommand | None = None
+        i += 1
+        while i < len(lines):
+            cont = lines[i]
+            if _is_task_checkbox(cont):
+                break
+            stripped = cont.strip()
+            if stripped == "":
+                i += 1
+                continue
+            if not (cont.startswith("  ") or cont.startswith("\t")):
+                break
+            lower = stripped.lower()
+            if "**allowlist:**" in lower or lower.startswith("- allowlist:"):
+                allowlist = _parse_allowlist_line(stripped)
+            elif "**seal:**" in lower or lower.startswith("- seal:"):
+                seal = _parse_seal_line(stripped)
+            else:
+                break
+            i += 1
+        out.append(
+            Task(
+                checked=task.checked,
+                text=task.text,
+                tid=task.tid,
+                allowlist=allowlist,
+                seal=seal,
+            )
+        )
+    return tuple(out)
 
 
 def _table_row_cells(line: str) -> list[str]:
@@ -415,7 +490,26 @@ class StoryBody(BaseModel):
             raise TaskIdAmbiguous(tid, len(hits))
         target = hits[0]
         flipped = tuple(
-            Task(checked=checked, tid=t.tid, text=t.text) if t is target else t
+            Task(
+                checked=checked,
+                tid=t.tid,
+                text=t.text,
+                allowlist=t.allowlist,
+                seal=t.seal,
+            )
+            if t is target
+            else t
             for t in self.tasks.root
         )
         return self.model_copy(update={"tasks": TaskList(flipped)})
+
+    def task_by_id(self, tid: TaskId) -> Task:
+        absent = sum(1 for t in self.tasks.root if t.tid is None)
+        if absent:
+            raise TaskIdAbsent(absent)
+        hits = tuple(t for t in self.tasks.root if t.tid == tid)
+        if len(hits) == 0:
+            raise TaskIdNotFound(tid)
+        if len(hits) > 1:
+            raise TaskIdAmbiguous(tid, len(hits))
+        return hits[0]

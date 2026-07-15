@@ -9,6 +9,8 @@ from functools import cache
 from typing import Any
 
 from app.api import mcp
+from fnmatch import fnmatch
+
 from app.domain.config import BoardTarget, ProjectNumber, RepoName, RepoOwner
 from app.domain.config import SETTINGS
 from app.domain.target import configured_target
@@ -16,7 +18,7 @@ from app.domain.epic import EpicBody
 from app.domain import git
 from app.domain.gh import graphql, run
 from app.domain.issue import BoardEntry, BoardSurvey, ClosedIssue, IssueRecord, OpenIssue
-from app.domain.story import StoryBody, TaskList
+from app.domain.story import StoryBody, Task, TaskList
 from app.domain.type import (
     BOARD_COLUMNS,
     BOARD_LABELS,
@@ -32,12 +34,14 @@ from app.domain.type import (
     IssueNumber,
     IssueTitle,
     LabelName,
+    SealCommand,
     StoryName,
     TaskId,
 )
 from app.domain.value import (
     AfterCard,
     AfterSibling,
+    Allowlist,
     CardAnchor,
     ColumnDestination,
     Deletion,
@@ -333,13 +337,135 @@ def create_story(
     name="check_story_task",
     description="Flip the task with the given T# identifier to checked, on a story's Tasks list. "
     "`task_id` is the integer N of the task's `TN` identifier. Refuses if no task carries that "
-    "identifier.",
+    "identifier. The judge must call verify_task_completion first — this tool does not re-check "
+    "git or the seal; it only flips the box after a proven PASS.",
 )
 def check_story_task(number: IssueNumber, task_id: TaskId, target: BoardTarget | None = None) -> str:
     target = _board(target)
     story = _current_story(number, target)
     _edit_body(number, story.with_task_id(task_id, checked=True).markdown, target)
     return f"check_story_task: #{number.root} {task_id.rendered}"
+
+
+def _path_in_allowlist(path: str, allowlist: Allowlist) -> bool:
+    for item in allowlist.root:
+        pat = item.root
+        if any(ch in pat for ch in "*?["):
+            if fnmatch(path, pat):
+                return True
+            continue
+        if path == pat or path.startswith(pat.rstrip("/") + "/"):
+            return True
+    return False
+
+
+def _dod_sole_seal(story: StoryBody) -> SealCommand | None:
+    """A Definition-of-Done item that is exactly one backticked command — the story-level seal."""
+    import re
+
+    sole = re.compile(r"^`([^`]+)`$")
+    for item in story.definition_of_done.root:
+        m = sole.match(item.text.root.strip())
+        if m:
+            return SealCommand(m.group(1))
+    return None
+
+
+@mcp.tool(
+    name="verify_task_completion",
+    description="Deterministic completion meter: load the task's Allowlist and Seal from the board, "
+    "run `git diff --name-only base...HEAD`, and refuse unless (1) the diff is non-empty, (2) every "
+    "path is inside the Allowlist, and (3) seal_command equals the board Seal exactly. base_rev "
+    "defaults to the story-start tag when present, else main. Pure facts — no LLM. The judge must "
+    "PASS this before check_story_task.",
+)
+def verify_task_completion(
+    number: IssueNumber,
+    task_id: TaskId,
+    seal_command: SealCommand,
+    base_rev: str | None = None,
+    target: BoardTarget | None = None,
+) -> str:
+    target = _board(target)
+    story = _current_story(number, target)
+    task = story.task_by_id(task_id)
+    if task.allowlist is None:
+        raise ValueError(
+            f"{task_id.rendered} has no Allowlist on the board — rewrite the task with "
+            "`**Allowlist:**` paths before verifying"
+        )
+    board_seal = task.seal if task.seal is not None else _dod_sole_seal(story)
+    if board_seal is None:
+        raise ValueError(
+            f"{task_id.rendered} has no Seal and Definition of Done has no sole-command gate — "
+            "add `**Seal:** \\`command\\`` on the task"
+        )
+    if seal_command.root != board_seal.root:
+        raise ValueError(
+            f"VALIDATION narrowed or drifted — submitted `{seal_command.root}` != board seal "
+            f"`{board_seal.root}`"
+        )
+    base = base_rev
+    if base is None:
+        tag = git.tag_ref(_story_start_tag(number))
+        base = tag if tag is not None else git.MAIN.root
+    paths = git.changed_paths(base)
+    if not paths:
+        raise ValueError(
+            f"TREE DIFF empty against {base} — no paths changed; empty diff is not completion"
+        )
+    off = tuple(p for p in paths if not _path_in_allowlist(p, task.allowlist))
+    if off:
+        raise ValueError(
+            f"TREE DIFF outside Allowlist — off-list: {', '.join(off)}; "
+            f"allowlist: {', '.join(a.root for a in task.allowlist.root)}"
+        )
+    return (
+        f"verify_task_completion: PASS #{number.root} {task_id.rendered}\n"
+        f"seal: {board_seal.root}\n"
+        f"base: {base}\n"
+        f"paths ({len(paths)}):\n"
+        + "\n".join(f"- {p}" for p in paths)
+    )
+
+
+@mcp.tool(
+    name="read_task_slice",
+    description="Thin executor slice for one T#: task text, Allowlist, Seal, Condemned block, and "
+    "Context — not the full story novel. Use when spawning a development task so the agent does not "
+    "re-pay the whole contract in input tokens.",
+)
+def read_task_slice(number: IssueNumber, task_id: TaskId, target: BoardTarget | None = None) -> str:
+    target = _board(target)
+    story = _current_story(number, target)
+    task = story.task_by_id(task_id)
+    seal_cmd = task.seal.root if task.seal is not None else None
+    if seal_cmd is None:
+        dod_seal = _dod_sole_seal(story)
+        seal_cmd = dod_seal.root if dod_seal is not None else "(none — add Seal)"
+    allow = (
+        ", ".join(f"`{p.root}`" for p in task.allowlist.root)
+        if task.allowlist is not None
+        else "(none — add Allowlist)"
+    )
+    c = story.condemned
+    return "\n".join(
+        [
+            f"read_task_slice: #{number.root} {task_id.rendered}",
+            "",
+            f"TASK: {task.markdown}",
+            f"ALLOWLIST: {allow}",
+            f"SEAL: `{seal_cmd}`",
+            "",
+            "CONDEMNED:",
+            f"- Path: {c.path.root}",
+            f"- Reason: {c.reason.root}",
+            f"- Closure test: {c.closure_test.root}",
+            "",
+            "CONTEXT:",
+            story.context.root,
+        ]
+    )
 
 
 @mcp.tool(

@@ -133,6 +133,14 @@ def commits_between(start_rev: str, end_rev: str) -> CommitCount:
     return CommitCount(_count(f"{start_rev}..{end_rev}") if _resolves(start_rev) else 0)
 
 
+def changed_paths(base_rev: str, end_rev: str = "HEAD") -> tuple[str, ...]:
+    """Paths changed between two revs (`git diff --name-only`). Empty when `base_rev` does not resolve."""
+    if not _resolves(base_rev):
+        return ()
+    out = _git("diff", "--name-only", f"{base_rev}...{end_rev}").stdout
+    return tuple(line.strip() for line in out.splitlines() if line.strip())
+
+
 def tag_head(name: str) -> None:
     """Record the current HEAD under a lightweight tag, overwriting any prior tag of that name —
     the durable anchor for 'work since this story started'."""

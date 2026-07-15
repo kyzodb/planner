@@ -146,6 +146,18 @@ class TaskText(RootModel[str], frozen=True):
     root: str = Field(min_length=1)
 
 
+class AllowlistPath(RootModel[str], frozen=True):
+    """One path or glob the executor may touch for a task — board state, not spawn gossip."""
+
+    root: str = Field(min_length=1)
+
+
+class SealCommand(RootModel[str], frozen=True):
+    """The exact verification command a task must run — matched byte-for-byte at completion."""
+
+    root: str = Field(min_length=1)
+
+
 class TaskId(RootModel[int], frozen=True):
     """A task's append-only identity within its story's Tasks list: assigned once, never
     reused, never renumbered. `T3` renders and parses as the integer 3."""

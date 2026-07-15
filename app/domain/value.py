@@ -5,10 +5,11 @@ from typing import Annotated, Literal
 
 from enum import StrEnum
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, RootModel
 
 from app.domain.type import (
     Actor,
+    AllowlistPath,
     BranchRef,
     Choice,
     ChoiceType,
@@ -45,6 +46,12 @@ class Condemned(BaseModel):
     path: CondemnedPath
     reason: CondemnedReason
     closure_test: ClosureTest
+
+
+class Allowlist(RootModel[tuple[AllowlistPath, ...]], frozen=True):
+    """The closed set of paths a task may touch. Completion requires `git diff` ⊆ this set."""
+
+    root: tuple[AllowlistPath, ...] = Field(min_length=1)
 
 
 # ── EvidenceNeeded: "None" was never a value, it's a second state ────────────

@@ -1,28 +1,16 @@
 ---
 name: kyzo-plan-manage-board
-description: The ONLY way to read or write the work board — every epic, story, column, task, and lifecycle operation goes through the plan MCP tools (prefixed mcp__plugin_kyzo-plan_board__), never raw gh. Use for any board operation; the tool descriptions themselves are the reference.
+description: The ONLY way to read or write the work board — plan MCP tools (mcp__plugin_kyzo-plan_board__), never raw gh. Use for any board operation; tool descriptions are the reference.
 ---
 
 # kyzo-plan-manage-board
 
-The plan MCP server is the board's one authority. Tool schemas are deferred —
-load with `ToolSearch` `select:<name>` — and each tool's description is its
-documentation; this file carries only what lives between the tools.
+Tool schemas are deferred — `ToolSearch` `select:<name>`. This file is only what lives between tools.
 
-**The name grammar is the law.** `read_*` tools are pure and always safe —
-orient with `read_board_status` before acting. `start_*`/`finish_*` are gated
-lifecycle transitions that refuse with typed reasons; never work around a
-refusal. `move_to_*` are free column moves. Every other verb authors board
-content. `delete_issues` destroys — operator-ordered only.
+**Grammar:** `read_*` pure — orient with `read_board_status`. `start_*`/`finish_*` gated — never work around refusals. `move_to_*` free. Authoring verbs write content. `delete_issues` operator-only.
 
-**The board model.** One axis: column position plus order within it — `Backlog`
-(hidden), `Later`/`Next`/`Now` (epic horizons), `In Progress`, `Blocked`,
-`Done`. A story's horizon is read off its parent epic's column. Sub-issue order
-is execution order.
+**Model:** one axis — column + order. Horizons `Later`/`Next`/`Now` are epics. Story horizon derives from parent. Sub-issue order = execution order.
 
-**Branch-per-epic.** One epic at a time on one branch; focus and In Progress
-ride the epic's branch; one story In Progress at a time. Story execution order
-is fixed: `start_story`, then the kyzo-plan-demolition agent clears the
-condemned surface, then development tasks — never development first. A task
-box is flipped only by the judge through `check_story_task`. Never use raw `gh` for board
-writes; never widen or bypass these tools.
+**Lifecycle:** branch-per-epic; one story In Progress. Order: `start_story` → demolition → development tasks. Checkbox only via judge after `verify_task_completion`.
+
+**Spawning work:** use skill `kyzo-plan-run-story` (allowlist arm, XML spawn, path-only monitor, N=5 stall, kill on second offense).

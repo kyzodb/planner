@@ -28,15 +28,19 @@ Three properties enforce this:
 1. **Point at a reference.** Name the exact file, module, pattern, or spec the
    agent works against — "compare against `crates/…/canonical.rs`", never "find
    where the codec lives."
-2. **Name the verification gate.** One Definition-of-Done item states the exact
-   command or named check that proves done, so completion is verified, never
-   self-attested. Never invent a gate you cannot confirm is real; if the true
-   gate is unknown, mark it `[OPEN]`.
+2. **Name the verification gate on every completion-claiming task.** Each `T#` carries
+   indented `**Allowlist:**` paths and `**Seal:**` \`exact command\` — board state the
+   verify tool reads. One Definition-of-Done item is the same command in backticks.
+   Never invent a gate you cannot confirm; mark `[OPEN]` if unknown.
 3. **Mark decided vs open.** Decided content is immutable and executed as
    written. Anything genuinely undecided is marked `[OPEN]` with who decides,
    and the agent escalates it rather than improvising. Do not manufacture false
    specificity to satisfy this — a named file that is wrong is worse than an
    honest `[OPEN]`.
+4. **Bound the cut.** One `T#` is not an unbounded grind. For mechanical
+   migrations across many files, write board-level sub-slices (`T5a`/`T5b`, or
+   separate tasks) or name orchestrator batches that each end in a compile
+   checkpoint — never one agent over 100+ files rediscovering the same symbol.
 
 ## GitHub and the board
 
@@ -115,7 +119,9 @@ so that <state of value change>.
 
 ## Tasks
 
-- [ ] T1 — <task that produces code, test coverage, benchmark evidence, committed artifact, or explicit decision artifact>
+- [ ] T1 — <one clause: code, test, artifact, or decision>
+  - **Allowlist:** `<path-or-glob>`, `<path>`
+  - **Seal:** `<exact verification command>`
 
 ## Definition of Done
 
@@ -123,7 +129,7 @@ so that <state of value change>.
 - [ ] <the condemned path is removed, bounded, or mechanically rejected>
 - [ ] <the engineering choice is implemented, measured, or decided by named evidence>
 - [ ] <every Sources entry is satisfied here or explicitly re-homed to a named story>
-- [ ] <the result is provable by the named verification gate — the exact command or check — not self-attested>
+- [ ] `<exact verification gate command>`
 ```
 
 `T#` identifiers are append-only: assigned once, never renumbered when a task is
@@ -157,8 +163,8 @@ Write each field for its consumer:
   files, symbols, adapters, tests, and call paths to remove. A vague block
   leaves nothing that can be safely deleted.
 - **kyzo-plan-development-task** executes one `T#` task at a time.
-- **kyzo-plan-task-completion-judge** checks a box only against the
-  **Definition of Done** item that names the exact verification-gate command.
+- **kyzo-plan-task-completion-judge** calls `verify_task_completion` (Allowlist +
+  Seal + real `git diff`) then checks the box only on PASS.
 
 ## Field Rules
 
@@ -178,8 +184,8 @@ Write each field for its consumer:
 | `Engineering Choice.Consequence` | What changes because the choice is made. |
 | `Engineering Choice.Evidence needed` | May block the final choice only for discovery, measurement, demo-signal, or performance stories; otherwise `None`. |
 | `Context` | Only execution/review context. Every reference named by exact path/module/pattern/spec; every undecided sub-decision marked `[OPEN]` with who decides. |
-| `Tasks` | Each produces code, tests, benchmark evidence, committed artifacts, or a decision artifact. |
-| `Definition of Done` | Closes the value change, the condemned path, the engineering choice, and every source; one item names the exact verification gate. |
+| `Tasks` | One clause each; every code task has `**Allowlist:**` + `**Seal:**`; slice large migrations. |
+| `Definition of Done` | Closes value/condemned/choice/sources; one item is the sole backticked seal command. |
 
 ## Banned Lexicon
 
@@ -209,5 +215,6 @@ A story is invalid when any of these are true:
 * quality is performed through language instead of proven through mechanism and evidence
 * executing it requires re-derivation — no reference named to work against
 * no Definition-of-Done item names a verification gate
+* a completion-claiming task lacks `**Allowlist:**` or `**Seal:**`
 * a live open question is unmarked instead of flagged `[OPEN]`
 * it manufactures false specificity — a named file, line, or fix that is not true
