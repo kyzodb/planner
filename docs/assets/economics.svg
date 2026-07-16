@@ -24,7 +24,7 @@
   <rect x="440" y="96" width="392" height="64" rx="3" fill="#101813" stroke="#35443b"/>
   <rect x="440" y="96" width="3" height="64" fill="#2F7E52"/>
   <text x="456" y="116" font-size="12.5" font-weight="600" fill="#eef3ef">The story contract</text>
-  <text x="456" y="133" font-size="11" fill="#a9baaf">Named references, decided vs <tspan class="mono" font-size="10.5">[OPEN]</tspan>, Allowlist + Seal —</text>
+  <text x="456" y="133" font-size="11" fill="#a9baaf">Named references, decided vs <tspan class="mono" font-size="10.5">[OPEN]</tspan>, Allowlist + Check —</text>
   <text x="456" y="148" font-size="11" fill="#a9baaf">the thinking happens once, upstream.</text>
 
   <!-- band 2: insurance reads -->
@@ -76,7 +76,7 @@
   <rect x="440" y="392" width="392" height="64" rx="3" fill="#101813" stroke="#35443b"/>
   <rect x="440" y="392" width="3" height="64" fill="#2F7E52"/>
   <text x="456" y="412" font-size="12.5" font-weight="600" fill="#eef3ef">The judge</text>
-  <text x="456" y="429" font-size="11" fill="#a9baaf">Meters git against Allowlist + Seal, then rules on evidence.</text>
+  <text x="456" y="429" font-size="11" fill="#a9baaf">Meters git against Allowlist + Check, then rules on evidence.</text>
   <text x="456" y="444" font-size="11" fill="#a9baaf">FAIL names the missing proof — the retry is surgical.</text>
 
   <line x1="28" y1="470" x2="832" y2="470" stroke="#1b2620"/>

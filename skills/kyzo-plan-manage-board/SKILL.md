@@ -1,16 +1,16 @@
 ---
 name: kyzo-plan-manage-board
-description: The ONLY way to read or write the work board — plan MCP tools (mcp__plugin_kyzo-plan_board__), never raw gh. Use for any board operation; tool descriptions are the reference.
+description: ONLY board read/write — plan MCP tools, never raw gh. Tool descriptions are role×verb. Not write-story or run-story.
 ---
 
 # kyzo-plan-manage-board
 
-Tool schemas are deferred — `ToolSearch` `select:<name>`. This file is only what lives between tools.
+Tool schemas are deferred — `ToolSearch` `select:<name>`. Between tools:
 
-**Grammar:** `read_*` pure — orient with `read_board_status`. `start_*`/`finish_*` gated — never work around refusals. `move_to_*` free. Authoring verbs write content. `delete_issues` operator-only.
+**Grammar:** `read_*` pure (`read_board_status` first). `start_*`/`finish_*` gated — never stash around refusals. `move_to_*` free. Authoring verbs write content. `delete_issues` operator-only.
 
-**Model:** one axis — column + order. Horizons `Later`/`Next`/`Now` are epics. Story horizon derives from parent. Sub-issue order = execution order.
+**Model:** column + order. Horizons on epics. Story horizon from parent. Sub-issue order = execution order.
 
-**Lifecycle:** branch-per-epic; one story In Progress. Order: `start_story` → demolition → development tasks. Checkbox only via judge after `verify_task_completion`.
+**Lifecycle:** `start_story` → demolition → T#s (parent Check + judge + allowlist commit) → Final QA comment → `check_final_qa` → Done.
 
-**Spawning work:** use skill `kyzo-plan-run-story` (allowlist arm, XML spawn, path-only monitor, N=5 stall, kill on second offense).
+**Spawning:** `kyzo-plan-run-story`. **Authoring:** `kyzo-plan-write-story` / `kyzo-plan-write-epic`.

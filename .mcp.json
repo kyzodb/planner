@@ -14,7 +14,7 @@
         "PLAN_BOARD_OWNER": "${user_config.board_owner}",
         "PLAN_BOARD_REPO": "${user_config.board_repo}",
         "PLAN_BOARD_PROJECT": "${user_config.board_project}",
-        "UV_PROJECT_ENVIRONMENT": "${CLAUDE_PLUGIN_DATA}/venv"
+        "UV_PROJECT_ENVIRONMENT": "${CLAUDE_PLUGIN_ROOT}/.venv"
       }
     }
   }

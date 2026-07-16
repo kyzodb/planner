@@ -1,6 +1,6 @@
 [project]
 name = "kyzo-plan-mcp"
-version = "0.2.7"
+version = "0.2.8"
 description = "The kyzo MCP server: the KyzoDB Work board tools (the manage-board surface)."
 requires-python = ">=3.12"
 dependencies = [

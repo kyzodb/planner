@@ -1,6 +1,6 @@
 ---
 name: kyzo-plan-write-story
-description: create, review, or revise work-board stories using the story contract. use when writing story names, descriptions, source citations, condemned blocks, ceiling checks, engineering choices, tasks, and definitions of done. enforce explicit engineering commitments at the cited sources' full height instead of vague cleanup, fake certainty, deferred architecture, or low-ceiling work that merely passes.
+description: Author or revise board story contracts (name, sources, condemned, ceiling, choice, allowlisted T#s, Final QA DoD). Not epic authorship (write-epic), not T# execution (run-story), not raw board moves (manage-board).
 ---
 
 # Write Story
@@ -28,10 +28,12 @@ Three properties enforce this:
 1. **Point at a reference.** Name the exact file, module, pattern, or spec the
    agent works against — "compare against `crates/…/canonical.rs`", never "find
    where the codec lives."
-2. **Name the verification gate on every completion-claiming task.** Each `T#` carries
-   indented `**Allowlist:**` paths and `**Seal:**` \`exact command\` — board state the
-   verify tool reads. One Definition-of-Done item is the same command in backticks.
-   Never invent a gate you cannot confirm; mark `[OPEN]` if unknown.
+2. **Name Allowlist + check on every completion-claiming task.** Each `T#` carries
+   indented `**Allowlist:**` paths and `**Check:**` \`fast command\`. Keep it short
+   (targeted compile/test). Witness, merge-gate, full CI, and release arbiters do
+   **not** belong on the task or in DoD — they are outside Plan. The parent’s
+   allowlist commit is the seal after the check passes. Never invent a gate you
+   cannot confirm; mark `[OPEN]` if unknown.
 3. **Mark decided vs open.** Decided content is immutable and executed as
    written. Anything genuinely undecided is marked `[OPEN]` with who decides,
    and the agent escalates it rather than improvising. Do not manufacture false
@@ -121,15 +123,11 @@ so that <state of value change>.
 
 - [ ] T1 — <one clause: code, test, artifact, or decision>
   - **Allowlist:** `<path-or-glob>`, `<path>`
-  - **Seal:** `<exact verification command>`
+  - **Check:** `<exact verification command>`
 
 ## Definition of Done
 
-- [ ] <the value change is present>
-- [ ] <the condemned path is removed, bounded, or mechanically rejected>
-- [ ] <the engineering choice is implemented, measured, or decided by named evidence>
-- [ ] <every Sources entry is satisfied here or explicitly re-homed to a named story>
-- [ ] `<exact verification gate command>`
+- [ ] Final QA — parent posts VALUE/CONDEMNED/CHOICE/SOURCES verdict then `check_final_qa`
 ```
 
 `T#` identifiers are append-only: assigned once, never renumbered when a task is
@@ -155,16 +153,17 @@ context. Shape it for the scanning eye:
   progress; split compound tasks unless their halves are inseparable evidence.
 - Bold nothing except the schema's field labels and true emphasis.
 
-## The story feeds a three-agent pipeline
+## The story feeds the pipeline
 
 Write each field for its consumer:
 
-- **kyzo-plan-demolition** acts on the **Condemned** block: name the concrete
-  files, symbols, adapters, tests, and call paths to remove. A vague block
-  leaves nothing that can be safely deleted.
-- **kyzo-plan-development-task** executes one `T#` task at a time.
-- **kyzo-plan-task-completion-judge** calls `verify_task_completion` (Allowlist +
-  Seal + real `git diff`) then checks the box only on PASS.
+- **kyzo-plan-demolition** acts on **Condemned** — concrete delete targets.
+- **kyzo-plan-development-task** executes one `T#` (allowlist edits only).
+- **Parent (run-story)** runs Check, allowlist-commits, posts Final QA comment, `check_final_qa`.
+- **kyzo-plan-task-completion-judge** loads board Check via `read_task_slice`, verifies, then `check_story_task` on PASS.
+
+**Banned in this contract:** git worktrees; Witness / CI / merge-queue as Plan work;
+check commands on DoD.
 
 ## Field Rules
 
@@ -184,8 +183,8 @@ Write each field for its consumer:
 | `Engineering Choice.Consequence` | What changes because the choice is made. |
 | `Engineering Choice.Evidence needed` | May block the final choice only for discovery, measurement, demo-signal, or performance stories; otherwise `None`. |
 | `Context` | Only execution/review context. Every reference named by exact path/module/pattern/spec; every undecided sub-decision marked `[OPEN]` with who decides. |
-| `Tasks` | One clause each; every code task has `**Allowlist:**` + `**Seal:**`; slice large migrations. |
-| `Definition of Done` | Closes value/condemned/choice/sources; one item is the sole backticked seal command. |
+| `Tasks` | One clause each; every code task has `**Allowlist:**` + `**Check:**` (fast only). Commit after PASS is the seal. |
+| `Definition of Done` | Exactly one `Final QA …` checkbox. Parent posts FINAL QA comment, then `check_final_qa`. |
 
 ## Banned Lexicon
 
@@ -211,10 +210,11 @@ A story is invalid when any of these are true:
 * both paths remain alive without a named reason and closure boundary
 * architecture is deferred without exact deciding evidence
 * banned lexicon appears outside the Condemned block
-* the Definition of Done cannot prove closure, or drops a source silently
 * quality is performed through language instead of proven through mechanism and evidence
 * executing it requires re-derivation — no reference named to work against
-* no Definition-of-Done item names a verification gate
-* a completion-claiming task lacks `**Allowlist:**` or `**Seal:**`
+* DoD is not exactly one `Final QA …` item
+* a task check is Witness, merge-gate, full CI, or release arbiter
+* the story assumes git worktrees or Plan-owned CI orchestration
+* a completion-claiming task lacks `**Allowlist:**` or `**Check:**`
 * a live open question is unmarked instead of flagged `[OPEN]`
 * it manufactures false specificity — a named file, line, or fix that is not true

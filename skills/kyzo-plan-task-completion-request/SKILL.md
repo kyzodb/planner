@@ -1,39 +1,22 @@
 ---
 name: kyzo-plan-task-completion-request
-description: Form a development-task submits inside completion_request tags to the judge. Use when the seal passed and the tree diff is ready. Not a board write.
+description: Minimal completion_request the development-task sends to the judge after allowlist edits. Not board writes, not git, not tree meters.
 ---
 
 # Task Completion Request
 
-Submit **only** this block to the judge:
+Submit **only** this block to the judge. Do not invent paths, commands, or git output — the judge loads the board and runs `verify_task_completion`.
 
 ```xml
 <completion_request>
 STORY: <number>
 TASK: T# — <exact board text>
 COMPLETION CLAIM: <one sentence>
-ALLOWLIST:
-- <path>
-TREE DIFF:
-- COMMAND: git diff --name-only <base>...HEAD
-  PATHS:
-  - <path>
 IMPLEMENTATION:
-- <file/symbol>
-OBLIGATION PROOF:
-- OBLIGATION: …
-  EVIDENCE: …   # ≤20 lines; path:symbol preferred
-  PROVES: …
-CONDEMNED CLOSURE:
-- CONDEMNED: …
-  PREVENTION: …
-  EVIDENCE: …
-VALIDATION:
-- COMMAND: <exact board Seal — no substitutes>
-  RESULT: <exit code + brief>
-STORY OR TASK CHANGES: None | …
-DEVIATIONS: None | …
+- <path:symbol or file you changed>
+DEVIATIONS: None | <what blocked the slice>
+STORY OR TASK CHANGES: None | <proposed change — do not apply it>
 </completion_request>
 ```
 
-Law: VALIDATION.COMMAND must equal board Seal; TREE DIFF must be real and ⊆ ALLOWLIST; empty diff = not done. Judge runs `verify_task_completion` — fake paths die.
+Done is judge PASS only.

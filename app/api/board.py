@@ -34,7 +34,7 @@ from app.domain.type import (
     IssueNumber,
     IssueTitle,
     LabelName,
-    SealCommand,
+    CheckCommand,
     StoryName,
     TaskId,
 )
@@ -333,20 +333,6 @@ def create_story(
     return f"create_story: #{number.root}"
 
 
-@mcp.tool(
-    name="check_story_task",
-    description="Flip the task with the given T# identifier to checked, on a story's Tasks list. "
-    "`task_id` is the integer N of the task's `TN` identifier. Refuses if no task carries that "
-    "identifier. The judge must call verify_task_completion first — this tool does not re-check "
-    "git or the seal; it only flips the box after a proven PASS.",
-)
-def check_story_task(number: IssueNumber, task_id: TaskId, target: BoardTarget | None = None) -> str:
-    target = _board(target)
-    story = _current_story(number, target)
-    _edit_body(number, story.with_task_id(task_id, checked=True).markdown, target)
-    return f"check_story_task: #{number.root} {task_id.rendered}"
-
-
 def _path_in_allowlist(path: str, allowlist: Allowlist) -> bool:
     for item in allowlist.root:
         pat = item.root
@@ -359,30 +345,53 @@ def _path_in_allowlist(path: str, allowlist: Allowlist) -> bool:
     return False
 
 
-def _dod_sole_seal(story: StoryBody) -> SealCommand | None:
-    """A Definition-of-Done item that is exactly one backticked command — the story-level seal."""
-    import re
+@mcp.tool(
+    name="check_story_task",
+    description="JUDGE ONLY after verify_task_completion PASS — flip one Tasks T# checkbox. "
+    "`task_id` is N in TN. Never from demolition/development-task/parent shortcut. "
+    "DoD is check_final_qa, not this tool.",
+)
+def check_story_task(number: IssueNumber, task_id: TaskId, target: BoardTarget | None = None) -> str:
+    target = _board(target)
+    story = _current_story(number, target)
+    _edit_body(number, story.with_task_id(task_id, checked=True).markdown, target)
+    return f"check_story_task: #{number.root} {task_id.rendered}"
 
-    sole = re.compile(r"^`([^`]+)`$")
-    for item in story.definition_of_done.root:
-        m = sole.match(item.text.root.strip())
-        if m:
-            return SealCommand(m.group(1))
-    return None
+
+@mcp.tool(
+    name="check_final_qa",
+    description="PARENT ONLY after every T# is checked AND after posting a FINAL QA comment "
+    "(VALUE / CONDEMNED / CHOICE / SOURCES). Flips the single Final QA DoD box. Refuses while "
+    "Tasks incomplete. Not judge/demolition/task. No worktrees, Witness, or CI-in-Plan.",
+)
+def check_final_qa(number: IssueNumber, target: BoardTarget | None = None) -> str:
+    target = _board(target)
+    story = _current_story(number, target)
+    tasks = story.tasks.completion
+    if tasks.checked != tasks.total:
+        raise ValueError(
+            f"#{number.root} Tasks incomplete ({tasks.rendered}) — finish every T# via the judge "
+            "before Final QA"
+        )
+    updated = story.with_dod_all_checked(True)
+    _edit_body(number, updated.markdown, target)
+    return (
+        f"check_final_qa: #{number.root} definition_of_done "
+        f"{updated.definition_of_done.completion.rendered}"
+    )
 
 
 @mcp.tool(
     name="verify_task_completion",
-    description="Deterministic completion meter: load the task's Allowlist and Seal from the board, "
-    "run `git diff --name-only base...HEAD`, and refuse unless (1) the diff is non-empty, (2) every "
-    "path is inside the Allowlist, and (3) seal_command equals the board Seal exactly. base_rev "
-    "defaults to the story-start tag when present, else main. Pure facts — no LLM. The judge must "
-    "PASS this before check_story_task.",
+    description="JUDGE ONLY before check_story_task. Supply check_command from read_task_slice "
+    "(board Check), never from agent testimony. Passes only if Check matches board and dirty "
+    "paths vs HEAD are non-empty and ⊆ Allowlist. Optional base_rev = committed range. "
+    "Task agents never call this or run git.",
 )
 def verify_task_completion(
     number: IssueNumber,
     task_id: TaskId,
-    seal_command: SealCommand,
+    check_command: CheckCommand,
     base_rev: str | None = None,
     target: BoardTarget | None = None,
 ) -> str:
@@ -394,36 +403,41 @@ def verify_task_completion(
             f"{task_id.rendered} has no Allowlist on the board — rewrite the task with "
             "`**Allowlist:**` paths before verifying"
         )
-    board_seal = task.seal if task.seal is not None else _dod_sole_seal(story)
-    if board_seal is None:
+    if task.check is None:
         raise ValueError(
-            f"{task_id.rendered} has no Seal and Definition of Done has no sole-command gate — "
-            "add `**Seal:** \\`command\\`` on the task"
+            f"{task_id.rendered} has no `**Check:**` on the task — add the check command there "
+            "(not on Definition of Done)"
         )
-    if seal_command.root != board_seal.root:
+    board_check = task.check
+    if check_command.root != board_check.root:
         raise ValueError(
-            f"VALIDATION narrowed or drifted — submitted `{seal_command.root}` != board seal "
-            f"`{board_seal.root}`"
+            f"VALIDATION narrowed or drifted — submitted `{check_command.root}` != board "
+            f"`{board_check.root}`"
         )
-    base = base_rev
-    if base is None:
-        tag = git.tag_ref(_story_start_tag(number))
-        base = tag if tag is not None else git.MAIN.root
-    paths = git.changed_paths(base)
+    if base_rev is not None:
+        base = base_rev
+        paths = git.changed_paths(base)
+        meter = f"commits {base}...HEAD"
+    else:
+        base = "HEAD+worktree"
+        paths = git.dirty_paths()
+        meter = "dirty worktree vs HEAD"
     if not paths:
         raise ValueError(
-            f"TREE DIFF empty against {base} — no paths changed; empty diff is not completion"
+            f"TREE DIFF empty ({meter}, base={base}) — no paths changed; empty diff is not completion"
         )
     off = tuple(p for p in paths if not _path_in_allowlist(p, task.allowlist))
     if off:
         raise ValueError(
             f"TREE DIFF outside Allowlist — off-list: {', '.join(off)}; "
-            f"allowlist: {', '.join(a.root for a in task.allowlist.root)}"
+            f"allowlist: {', '.join(a.root for a in task.allowlist.root)}; "
+            f"base={base} ({meter}). Foreign porcelain: restore or escalate — never stash"
         )
     return (
         f"verify_task_completion: PASS #{number.root} {task_id.rendered}\n"
-        f"seal: {board_seal.root}\n"
+        f"check: {board_check.root}\n"
         f"base: {base}\n"
+        f"meter: {meter}\n"
         f"paths ({len(paths)}):\n"
         + "\n".join(f"- {p}" for p in paths)
     )
@@ -431,18 +445,15 @@ def verify_task_completion(
 
 @mcp.tool(
     name="read_task_slice",
-    description="Thin executor slice for one T#: task text, Allowlist, Seal, Condemned block, and "
-    "Context — not the full story novel. Use when spawning a development task so the agent does not "
-    "re-pay the whole contract in input tokens.",
+    description="PARENT and JUDGE. One T#: task text, Allowlist, Check, Condemned, Context. "
+    "Judge takes Check from here for verify. Executor edits Allowlist only — no shell or git. "
+    "Parent runs Check after edits, before judge.",
 )
 def read_task_slice(number: IssueNumber, task_id: TaskId, target: BoardTarget | None = None) -> str:
     target = _board(target)
     story = _current_story(number, target)
     task = story.task_by_id(task_id)
-    seal_cmd = task.seal.root if task.seal is not None else None
-    if seal_cmd is None:
-        dod_seal = _dod_sole_seal(story)
-        seal_cmd = dod_seal.root if dod_seal is not None else "(none — add Seal)"
+    check_cmd = task.check.root if task.check is not None else "(none — add Check on the task)"
     allow = (
         ", ".join(f"`{p.root}`" for p in task.allowlist.root)
         if task.allowlist is not None
@@ -452,10 +463,11 @@ def read_task_slice(number: IssueNumber, task_id: TaskId, target: BoardTarget | 
     return "\n".join(
         [
             f"read_task_slice: #{number.root} {task_id.rendered}",
+            "ROLE: development-task edits ALLOWLIST only — parent runs CHECK; judge verifies",
             "",
             f"TASK: {task.markdown}",
             f"ALLOWLIST: {allow}",
-            f"SEAL: `{seal_cmd}`",
+            f"CHECK (parent runs): `{check_cmd}`",
             "",
             "CONDEMNED:",
             f"- Path: {c.path.root}",
@@ -613,7 +625,10 @@ class GateRefusal(Exception):
 
 class DirtyWorkingTree(GateRefusal):
     def __init__(self) -> None:
-        super().__init__("working tree or index is not clean — commit or stash before starting")
+        super().__init__(
+            "working tree or index is not clean — commit allowlisted work, restore foreign paths, "
+            "or escalate to the operator; never stash to pass this gate"
+        )
 
 
 class NotOnMain(GateRefusal):
@@ -814,12 +829,9 @@ def _epic_linked_branches(target: BoardTarget) -> set[BranchRef]:
 
 @mcp.tool(
     name="start_epic",
-    description="Start an epic on its own branch after deterministic safety checks: working tree "
-    "and index clean; HEAD is main; main is level with origin/main; branch_name is unused locally "
-    "and on origin; number is an open epic with at least one story, not already started; no other "
-    "epic has an unmerged branch. On pass: create branch_name off main linked to the epic and "
-    "pull the epic into Now. The epic never enters In Progress — that column is stories only; a "
-    "started epic is one in Now with a linked branch.",
+    description="Gated epic entry: clean tree (never stash to pass), HEAD on main, main≈origin/main, "
+    "branch unused, open epic with stories, no prior unmerged epic branch. On pass: create "
+    "branch_name off main, link it, move epic to Now. Epics never enter In Progress.",
 )
 def start_epic(number: IssueNumber, branch_name: BranchRef, target: BoardTarget | None = None) -> str:
     target = _board(target)
@@ -861,12 +873,10 @@ def start_epic(number: IssueNumber, branch_name: BranchRef, target: BoardTarget 
 
 @mcp.tool(
     name="start_story",
-    description="Start the next story of the active epic after deterministic safety checks: parent "
-    "epic is started (in Now with a linked branch); HEAD is that epic branch; no merge/rebase/cherry-pick "
-    "in progress; working tree and index clean; epic branch not diverged from origin; no sibling "
-    "story In Progress; number is the next unstarted story in sub-issue order; the preceding story "
-    "is Done with every Task and Definition-of-Done box checked and its work is on the branch. On "
-    "pass: move the story to In Progress on the epic branch.",
+    description="Gated next-story entry on the active epic branch: clean tree (never stash), "
+    "epic in Now with linked branch, HEAD on that branch, no in-flight git op, no sibling In "
+    "Progress, number is next unstarted sub-issue, preceding story Done with work on branch. On "
+    "pass: In Progress + story-start tag. Then run-story: demolition → T# loop → Final QA.",
 )
 def start_story(number: IssueNumber, target: BoardTarget | None = None) -> str:
     target = _board(target)
@@ -966,12 +976,9 @@ def move_to_blocked(number: IssueNumber, blocker: CommentText, target: BoardTarg
 
 @mcp.tool(
     name="move_to_done",
-    description="Move any card to Done, remove the focus label if present, and close the issue in "
-    "the same motion — Done and closed are one fact, owned by this flow, never delegated to a "
-    "board automation. A card whose body is a story contract refuses while any Tasks or Definition "
-    "of Done box is unchecked — completion is total, and this tool checks it so the operator "
-    "doesn't have to. For the active epic, finish_epic is the gated route that also verifies its "
-    "stories and branch.",
+    description="Move card to Done + close issue. Story contracts refuse while any Tasks or "
+    "Definition of Done box is unchecked — Tasks via judge/check_story_task, DoD via parent "
+    "check_final_qa after Final QA. Active epic: prefer finish_epic.",
 )
 def move_to_done(number: IssueNumber, target: BoardTarget | None = None) -> str:
     target = _board(target)

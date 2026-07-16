@@ -165,8 +165,9 @@ class AllowlistPath(RootModel[str], frozen=True):
     root: str = Field(min_length=1)
 
 
-class SealCommand(RootModel[str], frozen=True):
-    """The exact verification command a task must run — matched byte-for-byte at completion."""
+class CheckCommand(RootModel[str], frozen=True):
+    """The exact check command a task must pass — matched byte-for-byte at verify.
+    The allowlist commit is the seal; this is only the check you pass before it."""
 
     root: str = Field(min_length=1)
 

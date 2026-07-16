@@ -1,6 +1,18 @@
 # Examples
 
-## Spawn (good)
+## Demolition spawn
+
+```xml
+<demolition_spawn>
+  <story>#42</story>
+  <allowlist>
+    <path>crates/kyzo/src/old_index.rs</path>
+  </allowlist>
+  <condemned>Old IndexMut panic path</condemned>
+</demolition_spawn>
+```
+
+## Task spawn
 
 ```xml
 <task_spawn>
@@ -8,37 +20,33 @@
   <task>T3 — Replace IndexMut impl in crates/kyzo/src/map.rs</task>
   <allowlist>
     <path>crates/kyzo/src/map.rs</path>
-    <path>crates/kyzo/src/map/</path>
   </allowlist>
-  <seal>cargo check --workspace --all-targets</seal>
-  <condemned>Old IndexMut panic path in map.rs</condemned>
+  <check>cargo check -p kyzo --lib</check>
   <context_refs>crates/kyzo/src/map.rs</context_refs>
 </task_spawn>
 ```
 
-## Monitor lines (good)
+## After judge PASS
 
 ```
-Edit crates/kyzo/src/map.rs
-Bash cargo check --workspace --all-targets
+git add -- crates/kyzo/src/map.rs
+git commit -m "T3 — Replace IndexMut impl in map.rs"
 ```
 
-## Monitor whip (good)
+## After judge FAIL
 
 ```
-WHIP 1: Read crates/other/src/lib.rs ∉ allowlist
+git restore --worktree --staged -- crates/kyzo/src/map.rs
 ```
 
-## verify FAIL — narrowed seal
+## Final QA comment then tool
 
-Submitted seal `cargo check -p kyzo --lib` ≠ board `cargo check --workspace --all-targets` → FAIL.
+```
+FINAL QA
+VALUE: …
+CONDEMNED: …
+CHOICE: …
+SOURCES: …
+```
 
-## verify FAIL — empty diff
-
-`paths (0)` against story-start tag → FAIL.
-
-## Judge PASS path
-
-1. `verify_task_completion` → PASS  
-2. Semantic obligations ok  
-3. `check_story_task` → box flipped
+→ `check_final_qa` → `move_to_done`

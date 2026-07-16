@@ -23,7 +23,7 @@ from app.domain.type import (
     IssueLabel,
     IssueNumber,
     LedeLine,
-    SealCommand,
+    CheckCommand,
     SoThat,
     SourceEntry,
     StoryContext,
@@ -67,7 +67,7 @@ class Task(BaseModel):
     text: TaskText
     tid: TaskId | None = None
     allowlist: Allowlist | None = None
-    seal: SealCommand | None = None
+    check: CheckCommand | None = None
 
     @property
     def markdown(self) -> str:
@@ -80,8 +80,8 @@ class Task(BaseModel):
         if self.allowlist is not None:
             paths = ", ".join(f"`{p.root}`" for p in self.allowlist.root)
             lines.append(f"  - **Allowlist:** {paths}")
-        if self.seal is not None:
-            lines.append(f"  - **Seal:** `{self.seal.root}`")
+        if self.check is not None:
+            lines.append(f"  - **Check:** `{self.check.root}`")
         return "\n".join(lines)
 
 
@@ -155,7 +155,7 @@ class TaskList(RootModel[tuple[Task, ...]], frozen=True):
                         tid=TaskId(nxt),
                         text=task.text,
                         allowlist=task.allowlist,
-                        seal=task.seal,
+                        check=task.check,
                     )
                 )
                 nxt += 1
@@ -168,8 +168,58 @@ class TaskList(RootModel[tuple[Task, ...]], frozen=True):
         return _completion(self.root)
 
 
+_FINAL_QA_TEXT = (
+    "Final QA — parent confirms value change, condemned closure, engineering choice, "
+    "and Sources are closed"
+)
+
+
+def _normalize_dod_items(items: tuple[Task, ...]) -> tuple[Task, ...]:
+    """Definition of Done is one Final QA checkbox. Extra or mis-shaped items collapse to that."""
+    if not items:
+        return (Task(checked=False, text=TaskText(_FINAL_QA_TEXT)),)
+    only = items[0]
+    if (
+        len(items) == 1
+        and only.tid is None
+        and only.allowlist is None
+        and only.check is None
+        and only.text.root.casefold().startswith("final qa")
+    ):
+        return (only,)
+    return (
+        Task(
+            checked=all(t.checked for t in items),
+            text=TaskText(_FINAL_QA_TEXT),
+        ),
+    )
+
+
 class DefinitionOfDoneList(RootModel[tuple[Task, ...]], frozen=True):
-    root: tuple[Task, ...] = Field(min_length=1)
+    """Exactly one Final QA checkbox."""
+
+    root: tuple[Task, ...] = Field(min_length=1, max_length=1)
+
+    @model_validator(mode="before")
+    @classmethod
+    def _normalize(cls, data: object) -> object:
+        if isinstance(data, dict) and "root" in data:
+            raw = data["root"]
+            if isinstance(raw, (list, tuple)):
+                return _normalize_dod_items(tuple(raw))
+            return data
+        if isinstance(data, (list, tuple)):
+            return _normalize_dod_items(tuple(data))
+        return data
+
+    @model_validator(mode="after")
+    def _exactly_final_qa(self) -> Self:
+        item = self.root[0]
+        if item.tid is not None or item.allowlist is not None or item.check is not None:
+            raise ValueError("Definition of Done must be a bare Final QA checkbox")
+        if not item.text.root.casefold().startswith("final qa"):
+            raise ValueError("Definition of Done must start with 'Final QA'")
+        return self
 
     @property
     def completion(self) -> Completion:
@@ -209,11 +259,11 @@ def _parse_allowlist_line(raw: str) -> Allowlist:
     return Allowlist(paths)
 
 
-def _parse_seal_line(raw: str) -> SealCommand:
+def _parse_check_line(raw: str) -> CheckCommand:
     hits = _BACKTICK_RE.findall(raw)
     if len(hits) != 1:
-        raise ValueError("Seal line needs exactly one command in backticks")
-    return SealCommand(hits[0])
+        raise ValueError("Check line needs exactly one command in backticks")
+    return CheckCommand(hits[0])
 
 
 def _parse_task_line(line: str) -> Task:
@@ -230,7 +280,7 @@ def _is_task_checkbox(line: str) -> bool:
 
 
 def _tasks(section: str) -> tuple[Task, ...]:
-    """Checkbox tasks, each optionally followed by indented Allowlist and Seal lines."""
+    """Checkbox tasks, each optionally followed by indented Allowlist and Check lines."""
     lines = section.splitlines()
     out: list[Task] = []
     i = 0
@@ -241,7 +291,7 @@ def _tasks(section: str) -> tuple[Task, ...]:
             continue
         task = _parse_task_line(line)
         allowlist: Allowlist | None = None
-        seal: SealCommand | None = None
+        check: CheckCommand | None = None
         i += 1
         while i < len(lines):
             cont = lines[i]
@@ -256,8 +306,8 @@ def _tasks(section: str) -> tuple[Task, ...]:
             lower = stripped.lower()
             if "**allowlist:**" in lower or lower.startswith("- allowlist:"):
                 allowlist = _parse_allowlist_line(stripped)
-            elif "**seal:**" in lower or lower.startswith("- seal:"):
-                seal = _parse_seal_line(stripped)
+            elif "**check:**" in lower or lower.startswith("- check:") or "**seal:**" in lower or lower.startswith("- seal:"):
+                check = _parse_check_line(stripped)
             else:
                 break
             i += 1
@@ -267,7 +317,7 @@ def _tasks(section: str) -> tuple[Task, ...]:
                 text=task.text,
                 tid=task.tid,
                 allowlist=allowlist,
-                seal=seal,
+                check=check,
             )
         )
     return tuple(out)
@@ -495,13 +545,27 @@ class StoryBody(BaseModel):
                 tid=t.tid,
                 text=t.text,
                 allowlist=t.allowlist,
-                seal=t.seal,
+                check=t.check,
             )
             if t is target
             else t
             for t in self.tasks.root
         )
         return self.model_copy(update={"tasks": TaskList(flipped)})
+
+    def with_dod_all_checked(self, checked: bool = True) -> Self:
+        """Flip every Definition-of-Done box — Final QA close after all Tasks are checked."""
+        flipped = tuple(
+            Task(
+                checked=checked,
+                tid=t.tid,
+                text=t.text,
+                allowlist=t.allowlist,
+                check=t.check,
+            )
+            for t in self.definition_of_done.root
+        )
+        return self.model_copy(update={"definition_of_done": DefinitionOfDoneList(flipped)})
 
     def task_by_id(self, tid: TaskId) -> Task:
         absent = sum(1 for t in self.tasks.root if t.tid is None)

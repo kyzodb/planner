@@ -1,29 +1,29 @@
-# Gotchas (from real burns)
+# Gotchas
 
-## Lib-green / narrowed seal
+## Stash / hard-reset hygiene
 
-Running `cargo check -p foo --lib` when the task Seal is `cargo check --workspace --all-targets` is fraud. `verify_task_completion` fails. Do not shrink the gate mid-flight.
+Forbidden. Dirty foreign tree → escalate. FAIL → path-restore allowlist only.
 
-## Empty allowlist testimony
+## Greener Check
 
-"Done in allowlist" with `git diff --name-only` empty is not done. Discard the agent.
+Parent must run the board Check string exactly. Substitutes fail verify.
 
-## Shrink the cut
+## Empty dirty tree
 
-Dropping call sites to get green, or rewriting the task mid-flight, is a story change — form `STORY OR TASK CHANGES` / kill, never silent scope collapse.
+Judge verify fails if there is nothing under the allowlist. Discard empty testimony.
 
-## Stolen-valor narration
+## Worktrees / Witness / CI-in-Plan
 
-Measuring done by explanation, demo leftovers, or "zero errors in allowlist" reports without a tree diff. Trust verify + checkbox only.
+Banned. Not Tasks, not Check, not DoD.
 
-## Batch without proof-of-edit
+## Skip Final QA verdict
 
-Mega-batches that re-derive `IndexMut` across 100+ files. Slice T#s; compile checkpoint per batch.
+`check_final_qa` only after the FINAL QA comment. No silent box flip.
 
-## Whole-file insurance reads
+## Fake form meters
 
-Read that feeds no Edit is stall fuel. Whip.
+The form has no tree or Check fields. Judge reads the board and verifies.
 
-## Fake TREE DIFF on the form
+## Whole-file tourism / stall
 
-Pasted paths the git edge never saw. Verify runs real git — fake forms die.
+Read with no Edit → whip. Five tools with no Edit → whip.

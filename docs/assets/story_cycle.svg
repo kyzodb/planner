@@ -52,14 +52,14 @@
   <rect x="352" y="186" width="168" height="68" rx="3" fill="#101813" stroke="#35443b"/>
   <rect x="352" y="186" width="3" height="68" fill="#2F7E52"/>
   <text x="366" y="208" font-size="12.5" font-weight="600" fill="#eef3ef">Development task</text>
-  <text x="366" y="226" font-size="9.5" fill="#a9baaf">one T# · Allowlist + Seal</text>
+  <text x="366" y="226" font-size="9.5" fill="#a9baaf">one T# · Allowlist + Check</text>
   <text x="366" y="242" class="mono" font-size="9.5" fill="#7c8f83">board denied</text>
 
   <line x1="520" y1="220" x2="548" y2="220" stroke="#3f8a5c" stroke-width="2" marker-end="url(#fern)"/>
 
   <rect x="552" y="186" width="168" height="68" rx="3" fill="#1E4D33" stroke="#6FAE8B" stroke-width="1.5"/>
   <text x="566" y="208" font-size="12.5" font-weight="600" fill="#ffffff">Completion judge</text>
-  <text x="566" y="226" font-size="9.5" fill="#c6dccd">verify Allowlist + Seal,</text>
+  <text x="566" y="226" font-size="9.5" fill="#c6dccd">verify Allowlist + Check,</text>
   <text x="566" y="242" font-size="9.5" fill="#c6dccd">then rule on evidence</text>
 
   <!-- FAIL under the two boxes, inside the frame -->

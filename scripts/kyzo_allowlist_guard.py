@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""PreToolUse: deny Read/Edit/Write (and path-bearing Bash) outside KYZO allowlist.
+"""PreToolUse: deny Read/Edit/Write outside KYZO allowlist; deny git when armed.
 
 Expects env KYZO_TASK_SESSION pointing at a JSON file:
   {"allowlist": ["path/or/glob", ...], "offenses": 0}
 
-Reads Claude Code hook JSON from stdin. Denies with exit 2 when path is off-list.
-No session file → allow (orchestrator has not armed a task).
+Reads Claude Code hook JSON from stdin. Denies with exit 2 when path is off-list
+or when Bash invokes git. No session file → allow (orchestrator has not armed a task).
 """
 
 from __future__ import annotations
@@ -16,6 +16,8 @@ import re
 import sys
 from fnmatch import fnmatch
 from pathlib import Path
+
+_GIT_CMD = re.compile(r"(^|[\s;&|])git([\s]|$)")
 
 
 def _covers(path: str, allowlist: list[str]) -> bool:
@@ -42,11 +44,38 @@ def _paths_from_input(tool: str, tool_input: dict) -> list[str]:
     return []
 
 
+def _bash_invokes_git(tool: str, tool_input: dict) -> bool:
+    if tool != "Bash":
+        return False
+    cmd = tool_input.get("command") or ""
+    return bool(_GIT_CMD.search(cmd))
+
+
+def _deny(session_path: Path, data: dict, reason: str) -> None:
+    offenses = int(data.get("offenses") or 0) + 1
+    data["offenses"] = offenses
+    session_path.write_text(json.dumps(data, indent=2) + "\n")
+    full = f"KYZO allowlist deny ({offenses}): {reason}"
+    print(
+        json.dumps(
+            {
+                "hookSpecificOutput": {
+                    "permissionDecision": "deny",
+                    "permissionDecisionReason": full,
+                }
+            }
+        )
+    )
+    print(full, file=sys.stderr)
+    sys.exit(2)
+
+
 def main() -> None:
     session = os.environ.get("KYZO_TASK_SESSION")
     if not session or not Path(session).is_file():
         sys.exit(0)
-    data = json.loads(Path(session).read_text())
+    session_path = Path(session)
+    data = json.loads(session_path.read_text())
     allowlist = list(data.get("allowlist") or [])
     if not allowlist:
         sys.exit(0)
@@ -54,27 +83,17 @@ def main() -> None:
     payload = json.load(sys.stdin)
     tool = payload.get("tool_name") or payload.get("toolName") or ""
     tool_input = payload.get("tool_input") or payload.get("toolInput") or {}
+
+    # Armed session: git is never an allowlisted task action (verify/parent own git).
+    if _bash_invokes_git(tool, tool_input):
+        _deny(session_path, data, "git is denied while KYZO_TASK_SESSION is armed")
+
     paths = _paths_from_input(tool, tool_input)
     offenders = [p for p in paths if p and not _covers(p, allowlist)]
     if not offenders:
         sys.exit(0)
 
-    offenses = int(data.get("offenses") or 0) + 1
-    data["offenses"] = offenses
-    Path(session).write_text(json.dumps(data, indent=2) + "\n")
-    reason = f"KYZO allowlist deny ({offenses}): {', '.join(offenders)}"
-    print(
-        json.dumps(
-            {
-                "hookSpecificOutput": {
-                    "permissionDecision": "deny",
-                    "permissionDecisionReason": reason,
-                }
-            }
-        )
-    )
-    print(reason, file=sys.stderr)
-    sys.exit(2)
+    _deny(session_path, data, ", ".join(offenders))
 
 
 if __name__ == "__main__":

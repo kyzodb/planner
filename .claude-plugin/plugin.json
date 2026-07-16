@@ -1,7 +1,7 @@
 {
   "name": "kyzo-plan",
   "displayName": "Kyzo Plan",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "description": "A GitHub Projects work board as typed MCP tools: pure reads (read_board_status, read_column, ...), gated epic/story lifecycle (start_epic, start_story, finish_epic), free column moves, and authoring verbs \u2014 plus the kyzo-plan-manage-board skill that carries the operating model.",
   "author": {
     "name": "Kyzo"

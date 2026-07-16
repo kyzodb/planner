@@ -22,7 +22,7 @@ contract. The board is shared state, not a handoff chain. **35 typed MCP tools**
 operate it; git and a completion judge keep motion honest. A checkbox is a fact,
 not a self-attestation.
 
-<p align="center"><img src="docs/assets/story_cycle.svg" width="860" alt="One story, start to Done: start_story gates on git, demolition deletes the condemned surface, each development task runs under a path-allowlist monitor, and only the judge — after verify_task_completion — flips a task box."></p>
+<p align="center"><img src="docs/assets/story_cycle.svg" width="860" alt="One story to Done: start_story, demolition, allowlisted T#s, judge meters dirty tree, parent allowlist-commits, Final QA closes the single DoD box."></p>
 
 ## Install
 
@@ -106,9 +106,8 @@ hold the shapes. You commit:
 - **Sources / Condemned / Ceiling / Engineering Choice** — the product call,
   crystallized so an agent cannot reopen it as exploration.
 - **Context** — exact references; only genuine unknowns marked `[OPEN]`.
-- **Tasks** — append-only `T#` clauses, each with **`Allowlist:`** paths and a
-  **`Seal:`** command — board state the judge meters against git.
-- **Definition of Done** — including that seal as a checked item.
+- **Tasks** — append-only `T#` with **`Allowlist:`** and a fast **`Check:`**.
+- **Definition of Done** — exactly one **Final QA** item (`check_final_qa`). No Witness/CI/worktrees in the contract. Allowlist commit is the seal.
 
 Banned lexicon (*improve, polish, for now…*) stays out of tasks — or lives only
 inside Condemned, naming what is being killed. Agents execute the contract; they
@@ -122,7 +121,8 @@ deviation is the spawner's fault.* Paths are law. A live session:
 <p align="center"><img src="docs/assets/task_monitor.png" width="900" alt="Orchestrator monitoring a development-task tool-call stream while the task executes."></p>
 
 Orchestration lives in `kyzo-plan-run-story`: allowlist arming, XML spawn, path
-watch, stall detection, judge after `verify_task_completion`.
+watch, parent check, judge after `verify_task_completion`, allowlist commit (the seal),
+Final QA + `check_final_qa`.
 
 ## Built by Kyzo
 

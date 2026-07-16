@@ -141,6 +141,28 @@ def changed_paths(base_rev: str, end_rev: str = "HEAD") -> tuple[str, ...]:
     return tuple(line.strip() for line in out.splitlines() if line.strip())
 
 
+def paths_from_porcelain(out: str) -> tuple[str, ...]:
+    """Parse `git status --porcelain` into unique paths (rename targets win). Pure — no subprocess."""
+    paths: list[str] = []
+    seen: set[str] = set()
+    for line in out.splitlines():
+        if len(line) < 4:
+            continue
+        rest = line[3:]
+        if " -> " in rest:
+            rest = rest.split(" -> ", 1)[1]
+        path = rest.strip().strip('"')
+        if path and path not in seen:
+            seen.add(path)
+            paths.append(path)
+    return tuple(paths)
+
+
+def dirty_paths() -> tuple[str, ...]:
+    """Staged, unstaged, and untracked paths vs HEAD — the task WIP meter after parent commits."""
+    return paths_from_porcelain(_git("status", "--porcelain", "-uall").stdout)
+
+
 def tag_head(name: str) -> None:
     """Record the current HEAD under a lightweight tag, overwriting any prior tag of that name —
     the durable anchor for 'work since this story started'."""

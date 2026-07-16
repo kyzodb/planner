@@ -1,6 +1,6 @@
 ---
 name: kyzo-plan-write-epic
-description: create, review, or revise work-board epics. use when naming epic groups, writing epic outcome descriptions, or checking whether grouped stories share a real engineering/value transition. enforce epic language that describes the state of value change created by the story group instead of release theater, phase names, slogans, or generic completion language.
+description: Author or revise board epics — name + outcome as the value state the story group creates. Not story contracts (write-story), not T# runs (run-story), not column moves (manage-board).
 ---
 
 # Write Epic
